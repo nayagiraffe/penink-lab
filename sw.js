@@ -1,7 +1,7 @@
 /* Pen & Ink Lab 서비스 워커: 앱 파일을 기기에 보관해 인터넷 없이도 열리게 한다.
    사용자 데이터(IndexedDB)는 건드리지 않는다. 이 파일은 빌드 때 vite.config.js 가 채워서 dist/sw.js 로 만든다. */
-const CACHE = 'pil2-v1.0.4-fbed9161';
-const ASSETS = ["./","./assets/index-BkMVbgyi.js","./assets/index-CC9oBCad.css","./icons/favicon-32.png","./icons/favicon-64.png","./icons/icon-180.png","./icons/icon-192.png","./icons/icon-512.png","./icons/icon-maskable-512.png","./icons/logo-512.webp","./icons/logo-56.webp","./index.html","./manifest.webmanifest","./privacy.html"];
+const CACHE = 'pil2-v1.0.6-8002a5ae';
+const ASSETS = ["./","./assets/index-DNg-fK4F.css","./assets/index-YINrbGT7.js","./icons/favicon-32.png","./icons/favicon-64.png","./icons/icon-180.png","./icons/icon-192.png","./icons/icon-512.png","./icons/icon-maskable-512.png","./icons/logo-512.webp","./icons/logo-56.webp","./index.html","./manifest.webmanifest","./privacy.html"];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));
