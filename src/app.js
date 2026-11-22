@@ -6595,7 +6595,7 @@ function Tr({ kind: e, onClose: t, prefill: n }) {
       !c &&
         H(b, {
           children: [
-            H(`label`, {
+            !a && H(`label`, {
               class: `field`,
               children: [
                 H(`span`, { class: `flabel`, children: `카탈로그 범위` }),
@@ -6611,7 +6611,7 @@ function Tr({ kind: e, onClose: t, prefill: n }) {
                 }),
               ],
             }),
-            !a && H(`label`, {
+            H(`label`, {
               class: `field`,
               children: [
                 H(`span`, { class: `flabel`, children: `브랜드` }),
@@ -15206,7 +15206,7 @@ var ro = {
     [`inks`, `잉크`],
     [`pens`, `만년필`],
   ],
-  oo = `1.121.0`;
+  oo = `1.121.1`;
 function so({ message: e }) {
   return H(`main`, {
     class: `fatal`,
