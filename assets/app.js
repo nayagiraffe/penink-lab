@@ -10420,17 +10420,68 @@ function _i() {
     children: [H(hi, {}), H(gi, {}), H(mi, {})],
   });
 }
+var PAPER_PROFILE_CATALOG = [
+  { brand: `SAKAE TP`, model: `Tomoe River FP Loose Sheets 52gsm · White`, paperType: `Tomoe River FP`, color: `White`, gsm: 52, sourceNote: `제조사 사양 · 2025년 안내에 A4/A5, 52g/㎡ 루즈시트가 기재되어 있어요. 흡수성·표면 점수는 직접 시필 전까지 미확인으로 둡니다.`, sourceUrl: `https://www.sakaetp.co.jp/pdf/2025_07.pdf` },
+  { brand: `SAKAE TP`, model: `Tomoe River FP Loose Sheets 52gsm · Cream`, paperType: `Tomoe River FP`, color: `Cream`, gsm: 52, sourceNote: `제조사 사양 · 2025년 안내에 A4/A5, 52g/㎡ 크림색 루즈시트가 기재되어 있어요. 흡수성·표면 점수는 직접 시필 전까지 미확인으로 둡니다.`, sourceUrl: `https://www.sakaetp.co.jp/pdf/2025_07.pdf` },
+  { brand: `SAKAE TP`, model: `Tomoe River FP Loose Sheets 68gsm · White`, paperType: `Tomoe River FP`, color: `White`, gsm: 68, sourceNote: `제조사 사양 · 2025년 안내에 A4/A5, 68g/㎡ 흰색 루즈시트가 기재되어 있어요. 제조사는 52g보다 두꺼운 선택지로 소개합니다. 흡수성·표면 점수는 미확인입니다.`, sourceUrl: `https://www.sakaetp.co.jp/pdf/2025_07.pdf` },
+  { brand: `Hobonichi`, model: `Techo 2026 (Original / Cousin / Weeks 계열)`, paperType: `Tomoe River`, color: `아이보리 계열`, gsm: ``, sourceNote: `제조사 안내 · 얇고 가벼운 Tomoe River 종이를 사용합니다. 잉크·펜·환경에 따라 건조 지연이나 번짐이 생길 수 있다고 안내되어 있어요. 모델·연식별 차이는 실물 확인이 필요합니다.`, sourceUrl: `https://help.1101.com/hc/en-us/articles/4905460944926-Can-you-tell-me-about-the-paper-used-in-the-Hobonichi-Techo` },
+  { brand: `MIDORI`, model: `MD Notebook · Cream`, paperType: `MD PAPER`, color: `Cream`, gsm: ``, sourceNote: `제조사 안내 · 필기감을 고려해 개발한 MD PAPER입니다. 제조사는 번짐·뒷면 통과 저항과 종이 표면의 감촉을 설명합니다. 흡수성·표면 점수는 직접 시필 전까지 미확인으로 둡니다.`, sourceUrl: `https://www.midori-japan.co.jp/english/products/paper/` },
+  { brand: `MIDORI`, model: `MD Notebook · White`, paperType: `MD PAPER`, color: `White`, gsm: ``, sourceNote: `제조사 안내 · 필기감을 고려해 개발한 MD PAPER입니다. 제조사는 번짐·뒷면 통과 저항과 종이 표면의 감촉을 설명합니다. 흡수성·표면 점수는 직접 시필 전까지 미확인으로 둡니다.`, sourceUrl: `https://www.midori-japan.co.jp/english/products/paper/` },
+  { brand: `Rhodia`, model: `Webnotebook / Rhodiarama · Ivory`, paperType: `Clairefontaine vellum`, color: `Ivory`, gsm: 90, sourceNote: `제조사 제품 안내 · Webnotebook은 90g 아이보리색, 산성 없는 중성 종이로 소개됩니다. Rhodia 제품군 전체에 동일 사양을 적용하지 말고 모델별로 확인하세요.`, sourceUrl: `https://rhodiapads.com/collections_boutique_webnotebooks_desk.php` },
+  { brand: `Clairefontaine`, model: `Age Bag / My.notes`, paperType: `Vélin Velouté`, color: `제품별 상이`, gsm: 90, sourceNote: `제조사 제품 안내 · Age Bag 및 My.notes에 90g Vélin Velouté 종이가 기재되어 있어요. 흡수성·표면 점수는 직접 시필 전까지 미확인으로 둡니다.`, sourceUrl: `https://www.clairefontaine.com/fr/3518-22874-cahier-reliure-integrale-age-bag-781420c.html` },
+  { brand: `Maruman`, model: `Mnemosyne Notebook · 모델별 확인`, paperType: `Mnemosyne writing paper`, color: `제품별 확인`, gsm: ``, sourceNote: `제조사 종합 카탈로그에서 Mnemosyne 제품군을 확인했습니다. 모델에 따라 사양이 다를 수 있어 평량은 특정 모델의 포장·제품 사양을 확인한 뒤 입력하세요.`, sourceUrl: `https://www.e-maruman.co.jp/catalog/book/pdf/71.pdf` },
+  { brand: `Tsubame Note`, model: `Tsubame Note / Tsubame Memo · Foolscap`, paperType: `Tsubame neutral Foolscap`, color: `제품별 확인`, gsm: ``, sourceNote: `제조사 제품 자료 · Tsubame Memo 제품의 본문 종이를 중성지 Foolscap으로 표기합니다. 노트 모델별 종이 사양은 별도로 확인하세요.`, sourceUrl: `https://www.tsubamenote.co.jp/info/leaf_tsubamemo.pdf` },
+  { brand: `Apica`, model: `Premium C.D. Notebook`, paperType: `Premium C.D. paper`, color: `Off-white`, gsm: 86.5, sourceNote: `판매처 사양 · 86.5g/㎡, 매끄러운 미색 종이로 기재되어 있어요. 제조사 원문 사양은 이번 조사에서 확인하지 못했으므로 구매 시 제품 표기를 재확인하세요.`, sourceUrl: `https://www.apronail.com/product/apica-cd-premium-notebook-b5/` },
+  { brand: `Wearingeul`, model: `Nobile Note`, paperType: `Nobile Paper`, color: `제품별 확인`, gsm: 101, sourceNote: `제조사 자료 · 101g/㎡. 제조사는 잉크 색 표현과 약간의 표면감, 필기용 적합성을 설명합니다.`, sourceUrl: `https://www.wearingeul.com/` },
+  { brand: `Wearingeul`, model: `Reservoir Thread Note`, paperType: `Reservoir Paper`, color: `제품별 확인`, gsm: 140, sourceNote: `제조사 제품 자료 · 140g/㎡. 제조사는 두꺼운 종이와 거친 표면감을 소개합니다. 별도 제품 사양 링크에서 노트 형식·페이지 구성을 확인할 수 있어요.`, sourceUrl: `https://www.wearingeul.com/` },
+  { brand: `MULDEN`, model: `Graphilo Notebook / Memo Pad`, paperType: `Graphilo`, color: `제품별 확인`, gsm: 81.4, sourceNote: `제조사/판매 페이지 안내 · 잉크 색과 셰이딩·셰ーン 표현을 강조합니다. 물기를 많이 올리거나 잉크에 따라 번질 수 있다고 안내하므로 직접 시필 결과를 별도로 기록하세요.`, sourceUrl: `https://mulden.kr/product/%EA%B7%B8%EB%9D%BC%ED%95%84%EB%A1%9C-%EB%A9%94%EB%AA%A8%ED%8C%A8%EB%93%9C/14/` },
+  { brand: `Kokuyo`, model: `PERPANEP TSURU TSURU`, paperType: `TSURU TSURU`, color: `제품별 확인`, gsm: ``, sourceNote: `제조사 설명 · 매끄럽게 미끄러지는 필기감을 목표로 한 PERPANEP 종이입니다. 만년필 전용 성능 보증은 아니므로 흡수성·표면 점수는 직접 시필 전까지 미확인입니다.`, sourceUrl: `https://www.kokuyo-st.co.jp/mag/kufu/2022/05/000224.html` },
+  { brand: `Kokuyo`, model: `PERPANEP SARA SARA`, paperType: `SARA SARA`, color: `제품별 확인`, gsm: ``, sourceNote: `제조사 설명 · 여러 필기구와 어울리는 부드러운 필기감을 목표로 한 PERPANEP 종이입니다. 만년필 전용 성능 보증은 아니므로 직접 시필을 권합니다.`, sourceUrl: `https://www.kokuyo-st.co.jp/mag/kufu/2022/05/000224.html` },
+  { brand: `Kokuyo`, model: `PERPANEP ZARA ZARA`, paperType: `ZARA ZARA`, color: `제품별 확인`, gsm: ``, sourceNote: `제조사 설명 · 표면의 거친 감촉과 필기 소리를 살린 PERPANEP 종이입니다. 만년필 전용 성능 보증은 아니므로 직접 시필을 권합니다.`, sourceUrl: `https://www.kokuyo-st.co.jp/mag/kufu/2022/05/000224.html` },
+];
 var PaperProfileBlank = () => ({
   name: ``,
   brand: ``,
+  model: ``,
+  paperType: ``,
+  color: ``,
   gsm: ``,
   absorbency: ``,
   texture: ``,
   notes: ``,
+  sourceNote: ``,
+  sourceUrl: ``,
 });
-function PaperProfileForm({ paper: e, onClose: t }) {
+function PaperCatalogPicker({ onSelect: selectPaper, onClose: closePicker }) {
+  return H(W, {
+    title: `종이 카탈로그`,
+    onClose: closePicker,
+    children: H(`div`, {
+      class: `stack`,
+      children: [
+        H(`p`, { class: `muted`, children: `확인한 제품 사양을 내 종이 목록에 복사합니다. 추가한 뒤에도 수정할 수 있으며, 흡수성·표면 평가는 직접 시필하기 전까지 비워 둡니다.` }),
+        H(`ul`, {
+          class: `log`,
+          children: PAPER_PROFILE_CATALOG.map((entry) => H(`li`, {
+            class: `card pad`,
+            children: [
+              H(`div`, { class: `log-title`, children: [H(`b`, { children: entry.brand }), ` · ${entry.model}`] }),
+              H(`p`, { class: `hint`, children: [entry.paperType, entry.color ? ` · ${entry.color}` : ``, entry.gsm ? ` · ${entry.gsm}g/㎡` : ` · 평량 미확인`] }),
+              H(`p`, { class: `hint`, children: entry.sourceNote }),
+              H(`div`, { class: `actions`, children: [
+                H(`a`, { class: `chip`, href: entry.sourceUrl, target: `_blank`, rel: `noopener noreferrer`, children: `출처 보기` }),
+                H(`button`, { class: `chip`, type: `button`, onClick: () => selectPaper(entry), children: `내 종이에 추가` }),
+              ]}),
+            ],
+          }, `${entry.brand}-${entry.model}`)),
+        }),
+      ],
+    }),
+  });
+}
+function PaperProfileForm({ paper: e, initial, onClose: t }) {
   let { c: n, toast: r } = U(),
-    [i, a] = R(() => ({ ...PaperProfileBlank(), ...(e || {}) })),
+    [i, a] = R(() => ({ ...PaperProfileBlank(), ...(initial || {}), ...(e || {}) })),
     [o, s] = R(``),
     c = (e) => (t) => a((n) => ({ ...n, [e]: t }));
   async function l(a) {
@@ -10442,10 +10493,15 @@ function PaperProfileForm({ paper: e, onClose: t }) {
     let u = {
       name: l,
       brand: i.brand.trim(),
+      model: i.model.trim(),
+      paperType: i.paperType.trim(),
+      color: i.color.trim(),
       gsm: i.gsm === `` ? `` : Number(i.gsm),
       absorbency: i.absorbency,
       texture: i.texture,
       notes: i.notes.trim(),
+      sourceNote: i.sourceNote.trim(),
+      sourceUrl: i.sourceUrl.trim(),
     };
     (e ? await n.patch(`papers`, e.id, u) : await n.add(`papers`, u),
       r(e ? `종이 프로필을 수정했어요` : `종이 프로필을 추가했어요`),
@@ -10500,6 +10556,20 @@ function PaperProfileForm({ paper: e, onClose: t }) {
         H(`div`, {
           class: `row2`,
           children: [
+            H(K, { label: `제품 모델`, children: H(`input`, { class: `input`, name: `paperModel`, value: i.model, onInput: (e) => c(`model`)(e.target.value), placeholder: `예: MD Notebook A5` }) }),
+            H(K, { label: `용지명`, children: H(`input`, { class: `input`, name: `paperType`, value: i.paperType, onInput: (e) => c(`paperType`)(e.target.value), placeholder: `예: MD PAPER` }) }),
+          ],
+        }),
+        H(`div`, {
+          class: `row2`,
+          children: [
+            H(K, { label: `종이색`, children: H(`input`, { class: `input`, name: `paperColor`, value: i.color, onInput: (e) => c(`color`)(e.target.value), placeholder: `예: 크림색, 흰색` }) }),
+            H(K, { label: `출처 링크`, children: H(`input`, { class: `input`, type: `url`, name: `paperSourceUrl`, value: i.sourceUrl, onInput: (e) => c(`sourceUrl`)(e.target.value), placeholder: `https://…` }) }),
+          ],
+        }),
+        H(`div`, {
+          class: `row2`,
+          children: [
             H(K, {
               label: `흡수성`,
               hint: `잉크가 종이에 스며드는 정도예요. 낮을수록 테·농담이 잘 드러나는 경향이 있어요. 미확인은 계산에서 제외돼요.`,
@@ -10540,6 +10610,17 @@ function PaperProfileForm({ paper: e, onClose: t }) {
             rows: `3`,
             value: i.notes,
             onInput: (e) => c(`notes`)(e.target.value),
+          }),
+        }),
+        H(K, {
+          label: `사양 출처·주의사항`,
+          hint: `제조사 설명인지 판매처 사양인지, 실측 전 확인이 필요한 내용인지 기록하세요.`,
+          children: H(`textarea`, {
+            class: `input`,
+            name: `paperSourceNote`,
+            rows: `3`,
+            value: i.sourceNote,
+            onInput: (e) => c(`sourceNote`)(e.target.value),
           }),
         }),
         o && H(`p`, { class: `hint bad`, role: `alert`, children: o }),
@@ -10659,6 +10740,13 @@ function PaperProfilesPage() {
             onClick: () => r({ kind: `new` }),
             children: `종이 프로필 추가`,
           }),
+          H(`button`, {
+            class: `btn outline`,
+            type: `button`,
+            id: `addPaperFromCatalog`,
+            onClick: () => r({ kind: `catalog` }),
+            children: `카탈로그에서 추가`,
+          }),
         ],
       }),
       H(`h2`, { class: `sec`, children: [`등록한 종이 `, paperProfiles.length, `종`] }),
@@ -10718,6 +10806,10 @@ function PaperProfilesPage() {
                     t.brand ? ` · ${t.brand}` : ``,
                   ],
                 }),
+                (t.model || t.paperType || t.color) && H(`p`, {
+                  class: `hint`,
+                  children: [t.model || ``, t.paperType ? ` · ${t.paperType}` : ``, t.color ? ` · ${t.color}` : ``],
+                }),
                 H(`div`, {
                   class: `muted`,
                   children: [
@@ -10774,6 +10866,8 @@ function PaperProfilesPage() {
                 ratingValues.length > 0 && ratingValues.length < 3 &&
                   H(`span`, { class: `tag evidence low`, children: `만족도 표본 적음` }),
                 t.notes && H(`p`, { class: `hint`, children: t.notes }),
+                t.sourceNote && H(`p`, { class: `hint`, children: t.sourceNote }),
+                t.sourceUrl && H(`a`, { class: `chip`, href: t.sourceUrl, target: `_blank`, rel: `noopener noreferrer`, children: `사양 출처 열기` }),
                 H(`div`, {
                   class: `actions`,
                   children: [
@@ -10827,8 +10921,20 @@ function PaperProfilesPage() {
         }),
       }),
       n &&
+        n.kind === `catalog` && H(PaperCatalogPicker, {
+          onClose: () => r(null),
+          onSelect: (entry) => {
+            let name = `${entry.brand} ${entry.model}`,
+              existing = t.papers.find((paper) => V(paper.name) === V(name));
+            existing
+              ? (notify(`이미 등록된 프로필을 열었어요. 기존 시필 기록은 유지됩니다.`), r({ kind: `edit`, paper: existing }))
+              : r({ kind: `new`, paper: { ...entry, name, notes: `` } });
+          },
+        }),
+      n && n.kind !== `catalog` &&
         H(PaperProfileForm, {
           paper: n.kind === `edit` ? n.paper : null,
+          initial: n.kind === `new` ? n.paper : null,
           onClose: () => r(null),
         }),
     ],
@@ -15031,7 +15137,7 @@ var ro = {
     [`inks`, `잉크`],
     [`pens`, `만년필`],
   ],
-  oo = `1.119.0`;
+  oo = `1.120.0`;
 function so({ message: e }) {
   return H(`main`, {
     class: `fatal`,
