@@ -10114,9 +10114,14 @@ function hi() {
   });
 }
 function gi() {
-  let { c: e } = U(),
+  let { c: e, go: goTo } = U(),
     { pens: t, inks: n } = e.state,
-    [r, i] = R(null);
+    [r, i] = R(null),
+    [driveChoice, setDriveChoice] = R(!1);
+  z(() => {
+    if (t.length || n.length) { setDriveChoice(!1); return; }
+    e.store.getMeta(`driveChoiceAsked`).then((asked) => setDriveChoice(!asked));
+  }, [e, t.length, n.length]);
   return t.length && n.length
     ? null
     : H(`div`, {
@@ -10137,7 +10142,19 @@ function gi() {
           }),
           H(`p`, {
             class: `hint`,
-            children: `🔒 데이터는 이 기기에만 저장되고 외부로 나가지 않아요. 백업(JSON·엑셀)으로 언제든 내보내거나 지울 수 있어요.`,
+            children: `🔒 기본 데이터는 이 기기에 저장돼요. Google Drive 동기화는 원할 때 직접 연결한 뒤에만 시작됩니다.`,
+          }),
+          driveChoice && H(`div`, {
+            class: `notice stack`,
+            id: `firstUseDriveChoice`,
+            children: [
+              H(`b`, { children: `기기 간 동기화도 설정할까요?` }),
+              H(`p`, { class: `hint`, children: `선택 사항이에요. Google 계정으로 연결하면 앱 전용 숨김 폴더에 기록을 동기화할 수 있어요. 연결하지 않아도 이 기기에서 계속 사용할 수 있고, 나중에 백업·복원에서 바꿀 수 있어요.` }),
+              H(`div`, { class: `row2`, children: [
+                H(`button`, { class: `btn primary`, type: `button`, onClick: async () => { await e.store.setMeta(`driveChoiceAsked`, !0); setDriveChoice(!1); goTo && goTo(`data`); }, children: `Drive 동기화 설정` }),
+                H(`button`, { class: `btn outline`, type: `button`, onClick: async () => { await e.store.setMeta(`driveChoiceAsked`, !0); setDriveChoice(!1); }, children: `이 기기에서만 사용` }),
+              ] }),
+            ],
           }),
           H(`ol`, {
             children: [
@@ -13681,8 +13698,8 @@ var Ya = (e) => {
   },
   Xa = (e, t) => Object.values(e).reduce((e, n) => e + n[t], 0);
 function Za({ clientId: e = wa, tokenManager: t }) {
-  let { c: n, photos: r, toast: i } = U(),
-    a = B(() => t || ja({ clientId: e }), [e, t]),
+  let { c: n, photos: r, toast: i, driveToken: sharedDriveToken, driveStatus } = U(),
+    a = B(() => t || sharedDriveToken || ja({ clientId: e }), [e, t, sharedDriveToken]),
     o = B(() => Ia({ getToken: () => a.ensure() }), [a]),
     [s, c] = R({ connected: !1, last: 0, canUndo: !1 }),
     [l, u] = R(!1),
@@ -13698,6 +13715,9 @@ function Za({ clientId: e = wa, tokenManager: t }) {
   if (
     (z(() => {
       p();
+      let syncDone = () => p();
+      window.addEventListener(`pil-drive-sync-complete`, syncDone);
+      return () => window.removeEventListener(`pil-drive-sync-complete`, syncDone);
     }, []),
     !Ea(e))
   )
@@ -13705,9 +13725,11 @@ function Za({ clientId: e = wa, tokenManager: t }) {
   async function m() {
     (u(!0), f({ t: `동기화하는 중…`, k: `` }));
     try {
-      (await a.ensure(), await n.store.setMeta(`driveConnected`, !0));
+      (await a.ensure(), await n.store.setMeta(`driveConnected`, !0), await n.store.setMeta(`driveChoiceAsked`, !0));
       let e = await Ka({ store: n.store, photos: r, drive: o });
       (await n.reload(), await p());
+      window.dispatchEvent(new CustomEvent(`pil-drive-sync-complete`));
+      window.dispatchEvent(new CustomEvent(`pil-drive-connection-changed`));
       let t = e.counts,
         s = (e, n) =>
           `${e}: 기기 ${t.local[n]} · 드라이브 ${t.remote[n]} → 합친 뒤 ${t.merged[n]}`,
@@ -13750,6 +13772,7 @@ function Za({ clientId: e = wa, tokenManager: t }) {
   async function h() {
     (a.revoke(),
       await n.store.setMeta(`driveConnected`, !1),
+      window.dispatchEvent(new CustomEvent(`pil-drive-connection-changed`)),
       await p(),
       f({
         t: `연결을 해제했어요. 이 기기의 데이터와 드라이브에 올려 둔 데이터는 그대로예요.`,
@@ -13818,6 +13841,7 @@ function Za({ clientId: e = wa, tokenManager: t }) {
           Ya(s.last),
         ],
       }),
+      driveStatus && H(`p`, { class: `ai-msg`, id: `driveAutoStatus`, role: `status`, children: driveStatus }),
       H(`button`, {
         class: `btn primary`,
         type: `button`,
@@ -13871,7 +13895,7 @@ function Za({ clientId: e = wa, tokenManager: t }) {
         children: [
           `기기마다 같은 구글 계정으로 연결하세요. 두 기기에서 같은 항목을 고치면 `,
           H(`b`, { children: `나중에 고친 쪽` }),
-          `이 남아요(항목별). 앱을 쓴 뒤 “지금 동기화”를 눌러 주세요(자동으로 올리지 않아요).`,
+          `이 남아요(항목별). 연결된 동안에는 변경 후와 앱으로 돌아왔을 때 자동 동기화해요. 브라우저를 새로 열었거나 권한이 만료되면 보안을 위해 “지금 동기화”를 눌러 다시 확인해 주세요.`,
         ],
       }),
     ],
@@ -14805,7 +14829,7 @@ var ro = {
     [`inks`, `잉크`],
     [`pens`, `만년필`],
   ],
-  oo = `1.115.1`;
+  oo = `1.116.0`;
 function so({ message: e }) {
   return H(`main`, {
     class: `fatal`,
@@ -14835,8 +14859,69 @@ function co() {
     t
   );
 }
+function DriveAutoSync({ c, photos, auth, onStatus }) {
+  let running = ft(!1), baseline = ft(``), timer = ft(null);
+  z(() => {
+    if (!Ea(wa)) return;
+    let active = !0, connected = !1;
+    baseline.current = Ua(F.map((kind) => c.state[kind]));
+    async function sync(reason) {
+      if (!active || !connected || running.current) return;
+      if (!auth.hasToken()) {
+        onStatus(`Drive 연결은 켜져 있어요. 이 앱을 새로 열었거나 권한이 만료된 경우 ‘지금 동기화’를 눌러 다시 확인해 주세요.`);
+        return;
+      }
+      running.current = !0;
+      onStatus(reason === `change` ? `변경 사항을 Drive에 동기화하고 있어요…` : `Drive 변경 사항을 확인하고 있어요…`);
+      try {
+        await Ka({ store: c.store, photos, drive: Ia({ getToken: () => auth.ensure() }) });
+        await c.reload();
+        baseline.current = Ua(F.map((kind) => c.state[kind]));
+        onStatus(`자동 동기화 완료 · ${Ya(Date.now())}`);
+        window.dispatchEvent(new CustomEvent(`pil-drive-sync-complete`));
+      } catch (error) {
+        onStatus(`자동 동기화를 완료하지 못했어요. 백업·복원에서 다시 동기화해 주세요. (${error.message || `연결 오류`})`);
+      } finally {
+        running.current = !1;
+      }
+    }
+    async function checkConnection(syncNow = !1) {
+      connected = !!(await c.store.getMeta(`driveConnected`));
+      if (connected && syncNow) sync(`foreground`);
+      else if (!connected) onStatus(``);
+    }
+    let unsubscribe = c.subscribe(() => {
+      if (!connected || running.current) return;
+      let next = Ua(F.map((kind) => c.state[kind]));
+      if (next === baseline.current) return;
+      baseline.current = next;
+      clearTimeout(timer.current);
+      timer.current = setTimeout(() => sync(`change`), 1200);
+    });
+    let onVisibility = () => {
+        if (document.visibilityState === `visible`) checkConnection(!0);
+      },
+      onOnline = () => checkConnection(!0),
+      onConnection = () => checkConnection(!1);
+    document.addEventListener(`visibilitychange`, onVisibility);
+    window.addEventListener(`online`, onOnline);
+    window.addEventListener(`pil-drive-connection-changed`, onConnection);
+    checkConnection(!0);
+    return () => {
+      active = !1;
+      clearTimeout(timer.current);
+      unsubscribe();
+      document.removeEventListener(`visibilitychange`, onVisibility);
+      window.removeEventListener(`online`, onOnline);
+      window.removeEventListener(`pil-drive-connection-changed`, onConnection);
+    };
+  }, [c, photos, auth]);
+  return null;
+}
 function lo({ c: e, photos: t }) {
   let n = Tt(e, t),
+    driveToken = B(() => ja({ clientId: wa }), []),
+    [driveStatus, setDriveStatus] = R(``),
     r = co(),
     [i, a] = R(() => {
       let e = location.hash.slice(1);
@@ -14901,10 +14986,11 @@ function lo({ c: e, photos: t }) {
         e,
       );
   return H(wt.Provider, {
-    value: { c: e, photos: t, toast: p, go: f, nav: o },
+    value: { c: e, photos: t, toast: p, go: f, nav: o, driveToken, driveStatus },
     children: H(`div`, {
       class: `app`,
       children: [
+        H(DriveAutoSync, { c: e, photos: t, auth: driveToken, onStatus: setDriveStatus }),
         H(`aside`, {
           class: `sidebar`,
           id: `sidebar`,
@@ -14962,7 +15048,7 @@ function lo({ c: e, photos: t }) {
                     n.lastBackup
                       ? `마지막 백업 ${h === 0 ? `오늘` : h + `일 전`}`
                       : `아직 백업한 적이 없어요`,
-                    ` · 데이터는 이 기기에만 저장돼요.`,
+                    ` · 데이터는 기기에 저장되며, 선택하면 Drive와 동기화돼요.`,
                   ],
                 }),
                 H(`button`, {
