@@ -10398,7 +10398,7 @@ function PaperProfilesPage() {
   let { c: e, go, toast: notify } = U(),
     t = e.state,
     [n, r] = R(null),
-    i = t.papers.slice().sort((e, t) => Dt.compare(e.name, t.name)),
+    paperProfiles = t.papers.slice().sort((e, t) => Dt.compare(e.name, t.name)),
     paperTests = (paper) => t.tests.filter((test) =>
       test.paperId === paper.id || (!test.paperId && String(test.paper || ``).trim() === paper.name),
     ),
@@ -10442,15 +10442,15 @@ function PaperProfilesPage() {
           }),
         ],
       }),
-      H(`h2`, { class: `sec`, children: [`등록한 종이 `, i.length, `종`] }),
-      !i.length &&
+      H(`h2`, { class: `sec`, children: [`등록한 종이 `, paperProfiles.length, `종`] }),
+      !paperProfiles.length &&
         H(kt, {
           children: `자주 쓰는 종이를 먼저 등록해 주세요. 시필할 때 선택할 수 있어요.`,
         }),
       H(`ul`, {
         class: `log`,
-        children: i.map((t) => {
-          let i = a(t),
+        children: paperProfiles.map((t) => {
+          let paperTestCount = a(t),
             unlinkedCount = unlinkedPaperTests(t).length,
             missingProperties = [
               !o[t.absorbency] && `흡수성`,
@@ -10458,7 +10458,7 @@ function PaperProfilesPage() {
               paperGsmValue(t.gsm) === null && `평량`,
             ].filter(Boolean),
             propertyCoverage = 3 - missingProperties.length,
-            similarPapers = t.papers
+            similarPapers = paperProfiles
               .filter((paper) => paper.id !== t.id)
               .map((paper) => {
                 let tests = paperTests(paper),
@@ -10472,7 +10472,7 @@ function PaperProfilesPage() {
                   testsCount: tests.length,
                   ratingCount: ratings.length,
                   averageRating: ratings.length ? ratings.reduce((sum, score) => sum + score, 0) / ratings.length : null,
-                  ...paperRecommendationMatch({ paperId: paper.id }, t, t.papers),
+                  ...paperRecommendationMatch({ paperId: paper.id }, t, paperProfiles),
                 };
               })
               .filter((candidate) => candidate.weight > 0.2)
@@ -10505,7 +10505,7 @@ function PaperProfilesPage() {
                     `흡수성 ${o[t.absorbency] || `미확인`}`,
                     ` · 표면 ${s[t.texture] || `미확인`}`,
                     paperGsmValue(t.gsm) !== null ? ` · ${paperGsmValue(t.gsm)}gsm` : ``,
-                    ` · 시필 ${i}건`,
+                    ` · 시필 ${paperTestCount}건`,
                     averageRating === null ? `` : ` · 전체 조합 평균 ${averageRating.toFixed(1)}/5 (${ratingValues.length}건)`,
                   ],
                 }),
@@ -10548,7 +10548,7 @@ function PaperProfilesPage() {
                 }),
                 !similarPapers.length && H(`p`, {
                   class: `hint`,
-                  children: t.papers.length < 2
+                    children: paperProfiles.length < 2
                     ? `유사 종이 후보가 없어요. 다른 종이 프로필을 추가하면 추천에서 함께 참고할 수 있어요.`
                     : `비교할 공통 속성이 없어 유사 종이를 고르지 못했어요. 흡수성·표면·평량 정보를 입력해 보세요.`,
                 }),
@@ -10590,14 +10590,14 @@ function PaperProfilesPage() {
                     H(`button`, {
                       class: `chip danger`,
                       type: `button`,
-                      disabled: i > 0,
+                      disabled: paperTestCount > 0,
                       title:
-                        i > 0 ? `연결된 시필이 있어 삭제할 수 없어요.` : ``,
+                        paperTestCount > 0 ? `연결된 시필이 있어 삭제할 수 없어요.` : ``,
                       onClick: async () => {
                         window.confirm(`${t.name} 종이 프로필을 지울까요?`) &&
                           (await e.remove(`papers`, t.id));
                       },
-                      children: i > 0 ? `시필 연결됨` : `삭제`,
+                      children: paperTestCount > 0 ? `시필 연결됨` : `삭제`,
                     }),
                   ],
                 }),
@@ -14805,7 +14805,7 @@ var ro = {
     [`inks`, `잉크`],
     [`pens`, `만년필`],
   ],
-  oo = `1.115.0`;
+  oo = `1.115.1`;
 function so({ message: e }) {
   return H(`main`, {
     class: `fatal`,
