@@ -1,4 +1,4 @@
-Pen & Ink Lab v1.117.0 — GitHub Pages 게시 묶음
+Pen & Ink Lab v1.118.0 — GitHub Pages 게시 묶음
 
 게시할 때:
 1. ZIP을 풀어 안의 파일과 폴더를 저장소 루트에 업로드하세요.

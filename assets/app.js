@@ -4390,6 +4390,74 @@ var $t = [
         n && H(`span`, { class: `fhint`, children: n }),
       ],
     });
+var LiveInkCatalog = (() => {
+  let checkedAt = `2026-11-23`,
+    pilotUrl = `https://www.pencafe.co.kr/shop/shopdetail.html?GfDT=bm19W1pG&branduid=3492529&mcode=006&scode=&search=&xcode=165`,
+    sailorUrl = `https://www.pencafe.co.kr/shop/shopdetail.html?GfDT=bWd3UFQ%3D&branduid=1111425&current_category=103002&mcode=002&scode=&search=&sort=manual&type=X&xcode=103`,
+    sailorOfficialUrl = `https://shikiori-en.sailor.co.jp/ink-color-lineup/`,
+    pilotOfficialUrl = `https://www.pilotpen.co.kr/brand_iroshizuku.php`,
+    pilotNames = [
+      `Ajisai`, `Ama-iro`, `Asa-gao`, `Chiku-rin`, `Fuyu-gaki`, `Fuyu-syogun`,
+      `Hana-ikada`, `Hotaru-bi`, `Kon-peki`, `Ku-jaku`, `Momiji`, `Murasaki-shikibu`,
+      `Rikka`, `Shin-kai`, `Shin-ryoku`, `Sui-gyoku`, `Syo-ro`, `Syun-gyo`,
+      `Take-sumi`, `To-ro`, `Tsuki-yo`, `Yama-budo`, `Yama-guri`, `Yu-yake`,
+    ],
+    pilotHints = {
+      Ajisai: [`블루 & 터콰이즈`, `블루`],
+      "Hana-ikada": [`보라 & 핑크`, `핑크`],
+      "Hotaru-bi": [`옐로우 & 골드`, `옐로`],
+      "Shin-ryoku": [`그린 & 라임`, `그린`],
+      "Sui-gyoku": [`블루 & 터콰이즈`, `터콰이즈`],
+      Rikka: [`블루 & 터콰이즈`, `블루`],
+      "Syun-gyo": [`레드 / 오렌지 / 버건디 브라운`, `레드블랙`],
+      "To-ro": [`레드 / 오렌지 / 버건디 브라운`, `오렌지`],
+    },
+    pilot = pilotNames.map((name) => {
+      let existing = $t.find((entry) => entry.brand === `Pilot` && entry.name === `Iroshizuku ` + name),
+        [family, hue] = pilotHints[name] || [existing?.family || `미분류`, existing?.hue || `미확인`];
+      return {
+        ...(existing || {}),
+        brand: `Pilot`,
+        name: `Iroshizuku ` + name,
+        family,
+        hue,
+        effect: `Standard`,
+        ko: existing?.ko || `파일럿 이로시주쿠 ` + name,
+        series: `Iroshizuku`,
+        marketStatus: `한국 판매처 상품 목록 확인 · 색상별 재고는 판매처에서 확인`,
+        market: `KR`,
+        checkedAt,
+        sourceUrl: pilotUrl,
+        manufacturerUrl: pilotOfficialUrl,
+      };
+    }),
+    sailorColors = [
+      [`Shigure`, `블랙 & 그레이`, `퍼플`], [`Tokiwamatsu`, `그린 & 라임`, `그린`],
+      [`Nioisumire`, `보라 & 핑크`, `퍼플`], [`Miruai`, `그린 & 라임`, `그린`],
+      [`Souten`, `블루 & 터콰이즈`, `블루`], [`Doyou`, `브라운 / 카키 웜톤`, `브라운`],
+      [`Yamadori`, `블루 & 터콰이즈`, `터콰이즈`], [`Okuyama`, `레드 / 오렌지 / 버건디 브라운`, `버건디`],
+      [`Irori`, `레드 / 오렌지 / 버건디 브라운`, `레드`], [`Yukiakari`, `블루 & 터콰이즈`, `블루`],
+      [`Wakauguisu`, `그린 & 라임`, `그린`], [`Sakuramori`, `보라 & 핑크`, `핑크`],
+      [`Fujisugata`, `보라 & 핑크`, `퍼플`], [`Rikyucha`, `브라운 / 카키 웜톤`, `브라운`],
+      [`Kinmokusei`, `레드 / 오렌지 / 버건디 브라운`, `오렌지`], [`Chushu`, `블랙 & 그레이`, `그레이`],
+      [`Yozakura`, `보라 & 핑크`, `핑크`], [`Yodaki`, `레드 / 오렌지 / 버건디 브라운`, `브라운`],
+      [`Yonaga`, `블루 & 터콰이즈`, `블루블랙`], [`Shimoyo`, `블랙 & 그레이`, `그레이`],
+    ].map(([name, family, hue]) => ({
+      brand: `Sailor`,
+      name: `Shikiori ` + name,
+      family,
+      hue,
+      effect: `Standard`,
+      ko: `세일러 시키오리 ` + name,
+      series: `Shikiori`,
+      marketStatus: `한국 판매처 상품 목록 확인 · 색상별 재고는 판매처에서 확인`,
+      market: `KR`,
+      checkedAt,
+      sourceUrl: sailorUrl,
+      manufacturerUrl: sailorOfficialUrl,
+    }));
+  return [...pilot, ...sailorColors];
+})();
 function q({ value: e, onChange: t, options: n, name: r, id: i }) {
   let a = n.map((e) => (Array.isArray(e) ? e : [e, e])),
     o =
@@ -6264,15 +6332,25 @@ function Tr({ kind: e, onClose: t, prefill: n }) {
     [extractingColor, setExtractingColor] = R(!1),
     [colorMessage, setColorMessage] = R(null),
     [pendingColorAdd, setPendingColorAdd] = R(null),
-    [catalogPrefill, setCatalogPrefill] = R(!1),
+    [catalogPrefill, setCatalogPrefill] = R(null),
+    [catalogMode, setCatalogMode] = R(`verified`),
+    [catalogBrand, setCatalogBrand] = R(``),
     g = (e) => (t) => h({ ...m, [e]: t }),
     _ = a ? r.state.pens : r.state.inks,
     v = B(
-      () =>
-        (a ? en : $t)
-          .filter((e) => Et(o, [e.brand, e.name, e.ko]))
-          .slice(0, 30),
-      [o, a],
+      () => {
+        let candidates = a
+          ? en
+          : catalogMode === `verified`
+            ? LiveInkCatalog
+            : [
+                ...LiveInkCatalog,
+                ...$t.filter((entry) => !LiveInkCatalog.some((current) =>
+                  V(current.brand) === V(entry.brand) && V(current.name) === V(entry.name))),
+              ];
+        return candidates.filter((entry) => (!catalogBrand || entry.brand === catalogBrand) && Et(o, [entry.brand, entry.name, entry.ko])).slice(0, 30);
+      },
+      [o, a, catalogMode, catalogBrand],
     ),
     y = (e, t) => _.some((n) => V(n.brand) === V(e) && V(n.name) === V(t)),
     colorMatches = !a && Cn(m.colorHex)
@@ -6348,7 +6426,7 @@ function Tr({ kind: e, onClose: t, prefill: n }) {
           packageType: `bottle`,
           capacityMl: ``,
         });
-        (setCatalogPrefill(!0), setPendingColorAdd(null), l(!0));
+        (setCatalogPrefill(e), setPendingColorAdd(null), l(!0));
         return;
       }
       return x(S(e.brand, e.name, t || e.nibs[0]));
@@ -6391,6 +6469,12 @@ function Tr({ kind: e, onClose: t, prefill: n }) {
       capacityMl: i,
       remainingMl: null,
       notes: m.notes.trim(),
+      ...(catalogPrefill?.marketStatus ? {
+        catalogSeries: catalogPrefill.series,
+        catalogMarket: catalogPrefill.market,
+        catalogCheckedAt: catalogPrefill.checkedAt,
+        catalogSourceUrl: catalogPrefill.sourceUrl,
+      } : {}),
       ...o,
     };
     return x(newInk);
@@ -6402,6 +6486,38 @@ function Tr({ kind: e, onClose: t, prefill: n }) {
       !c &&
         H(b, {
           children: [
+            !a && H(`label`, {
+              class: `field`,
+              children: [
+                H(`span`, { class: `flabel`, children: `카탈로그 범위` }),
+                H(`select`, {
+                  class: `input`,
+                  value: catalogMode,
+                  onChange: (event) => setCatalogMode(event.target.value),
+                  children: [
+                    H(`option`, { value: `verified`, children: `한국 판매처 상품 목록 확인 · Pilot 24종 + Sailor 20종` }),
+                    H(`option`, { value: `all`, children: `전체 입력 후보 · 판매 상태 미확인 포함` }),
+                  ],
+                }),
+              ],
+            }),
+            !a && H(`label`, {
+              class: `field`,
+              children: [
+                H(`span`, { class: `flabel`, children: `브랜드` }),
+                H(`select`, {
+                  class: `input`,
+                  value: catalogBrand,
+                  onChange: (event) => setCatalogBrand(event.target.value),
+                  children: [
+                    H(`option`, { value: ``, children: `전체 브랜드` }),
+                    [...new Set((catalogMode === `verified` ? LiveInkCatalog : [...LiveInkCatalog, ...$t]).map((entry) => entry.brand))]
+                      .sort((first, second) => first.localeCompare(second))
+                      .map((brand) => H(`option`, { value: brand, children: brand }, brand)),
+                  ],
+                }),
+              ],
+            }),
             H(`input`, {
               class: `input`,
               type: `search`,
@@ -6415,7 +6531,9 @@ function Tr({ kind: e, onClose: t, prefill: n }) {
             }),
             !a && H(`p`, {
               class: `hint`,
-              children: `카탈로그 결과를 누르면 등록 전에 정보를 확인하고 수정할 수 있어요.`,
+              children: catalogMode === `verified`
+                ? `상품 페이지에서 색상 선택 상품이 확인된 목록이에요. 재고와 판매 지역은 판매처에서 확인해 주세요. 제품을 고르면 내 목록에 추가하기 전에 정보를 고칠 수 있어요.`
+                : `이 목록에는 판매 여부를 확인하지 못한 기존 입력 후보도 포함돼요. 제품을 고르면 내 목록에 추가하기 전에 정보를 고칠 수 있어요.`,
             }),
             H(`ul`, {
               class: `results`,
@@ -6442,6 +6560,17 @@ function Tr({ kind: e, onClose: t, prefill: n }) {
                                 a ? e.nibs.join(`/`) : `${e.hue} · ${e.effect}`,
                               ],
                             }),
+                          ],
+                        }),
+                        !a && e.marketStatus && H(`p`, {
+                          class: `hint`,
+                          children: [
+                            e.marketStatus,
+                            ` · 확인 ${e.checkedAt}`,
+                            ` · `,
+                            H(`a`, { href: e.sourceUrl, target: `_blank`, rel: `noopener noreferrer`, children: `판매처 상품 페이지` }),
+                            ` · `,
+                            H(`a`, { href: e.manufacturerUrl, target: `_blank`, rel: `noopener noreferrer`, children: `제조사 라인업` }),
                           ],
                         }),
                         u === e &&
@@ -6479,7 +6608,7 @@ function Tr({ kind: e, onClose: t, prefill: n }) {
             H(`button`, {
               class: `btn outline`,
               type: `button`,
-              onClick: () => (setCatalogPrefill(!1), l(!0)),
+              onClick: () => (setCatalogPrefill(null), l(!0)),
               children: `직접 입력`,
             }),
           ],
@@ -6497,7 +6626,11 @@ function Tr({ kind: e, onClose: t, prefill: n }) {
             catalogPrefill && H(`p`, {
               class: `ai-note`,
               id: `catalogEditNotice`,
-              children: `카탈로그 정보를 불러왔어요. 실제 제품과 다르면 고친 뒤 내 잉크 목록에 추가하세요. 수정은 개인 목록에만 반영되고 기본 카탈로그는 바뀌지 않아요.`,
+              children: [
+                `카탈로그 정보를 불러왔어요. 실제 제품과 다르면 고친 뒤 내 잉크 목록에 추가하세요. 수정은 개인 목록에만 반영되고 기본 카탈로그는 바뀌지 않아요.`,
+                catalogPrefill.marketStatus && ` ${catalogPrefill.marketStatus} (확인 ${catalogPrefill.checkedAt})`,
+                catalogPrefill.sourceUrl && H(`a`, { href: catalogPrefill.sourceUrl, target: `_blank`, rel: `noopener noreferrer`, children: ` 판매처 확인` }),
+              ],
             }),
             H(K, {
               label: `브랜드`,
@@ -14839,7 +14972,7 @@ var ro = {
     [`inks`, `잉크`],
     [`pens`, `만년필`],
   ],
-  oo = `1.117.0`;
+  oo = `1.118.0`;
 function so({ message: e }) {
   return H(`main`, {
     class: `fatal`,
