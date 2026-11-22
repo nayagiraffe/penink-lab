@@ -6264,6 +6264,7 @@ function Tr({ kind: e, onClose: t, prefill: n }) {
     [extractingColor, setExtractingColor] = R(!1),
     [colorMessage, setColorMessage] = R(null),
     [pendingColorAdd, setPendingColorAdd] = R(null),
+    [catalogPrefill, setCatalogPrefill] = R(!1),
     g = (e) => (t) => h({ ...m, [e]: t }),
     _ = a ? r.state.pens : r.state.inks,
     v = B(
@@ -6334,24 +6335,24 @@ function Tr({ kind: e, onClose: t, prefill: n }) {
       fillDate: ``,
       notes: r,
     }),
-    C = (e, t) =>
-      x(
-        a
-          ? S(e.brand, e.name, t || e.nibs[0])
-          : {
-              brand: e.brand,
-              name: e.name,
-              family: e.family,
-              hue: e.hue,
-              ...(Cn(e.colorHex) ? { colorHex: e.colorHex.toLowerCase(), colorSource: `catalog` } : {}),
-              effect: e.effect,
-              flow: ``,
-              packageType: `bottle`,
-              capacityMl: null,
-              remainingMl: null,
-              notes: ``,
-            },
-      );
+    C = (e, t) => {
+      if (!a) {
+        h({
+          ...wr,
+          brand: e.brand || ``,
+          name: e.name || ``,
+          family: e.family || ``,
+          hue: e.hue || wr.hue,
+          ...(Cn(e.colorHex) ? { colorHex: e.colorHex.toLowerCase(), colorSource: `catalog` } : {}),
+          effect: e.effect || `Standard`,
+          packageType: `bottle`,
+          capacityMl: ``,
+        });
+        (setCatalogPrefill(!0), setPendingColorAdd(null), l(!0));
+        return;
+      }
+      return x(S(e.brand, e.name, t || e.nibs[0]));
+    };
   function w(e) {
     e.preventDefault();
     let t = m.brand.trim(),
@@ -6411,6 +6412,10 @@ function Tr({ kind: e, onClose: t, prefill: n }) {
               onInput: (e) => s(e.target.value),
               "aria-label": `카탈로그 검색`,
               autoFocus: !0,
+            }),
+            !a && H(`p`, {
+              class: `hint`,
+              children: `카탈로그 결과를 누르면 등록 전에 정보를 확인하고 수정할 수 있어요.`,
             }),
             H(`ul`, {
               class: `results`,
@@ -6474,7 +6479,7 @@ function Tr({ kind: e, onClose: t, prefill: n }) {
             H(`button`, {
               class: `btn outline`,
               type: `button`,
-              onClick: () => l(!0),
+              onClick: () => (setCatalogPrefill(!1), l(!0)),
               children: `직접 입력`,
             }),
           ],
@@ -6489,6 +6494,11 @@ function Tr({ kind: e, onClose: t, prefill: n }) {
                 class: `ai-note`,
                 children: `📷 사진에서 읽은 내용이에요. AI는 틀릴 수 있으니 확인하고 고쳐 주세요.`,
               }),
+            catalogPrefill && H(`p`, {
+              class: `ai-note`,
+              id: `catalogEditNotice`,
+              children: `카탈로그 정보를 불러왔어요. 실제 제품과 다르면 고친 뒤 내 잉크 목록에 추가하세요. 수정은 개인 목록에만 반영되고 기본 카탈로그는 바뀌지 않아요.`,
+            }),
             H(K, {
               label: `브랜드`,
               children: H(`input`, {
@@ -6688,7 +6698,7 @@ function Tr({ kind: e, onClose: t, prefill: n }) {
               class: `btn primary`,
               type: `submit`,
               id: `addSubmit`,
-              children: `추가`,
+              children: a ? `만년필 추가` : catalogPrefill ? `확인하고 내 잉크에 추가` : `추가`,
             }),
             !n &&
               H(`button`, {
@@ -14829,7 +14839,7 @@ var ro = {
     [`inks`, `잉크`],
     [`pens`, `만년필`],
   ],
-  oo = `1.116.0`;
+  oo = `1.117.0`;
 function so({ message: e }) {
   return H(`main`, {
     class: `fatal`,
