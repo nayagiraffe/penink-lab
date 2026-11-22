@@ -4380,6 +4380,44 @@ var $t = [
       nibs: [`F`, `M`, `B`, `Stub`],
       ko: `에스터브룩 에스티`,
     },
+    // Curated product models linked to current manufacturer lineups. Nib options
+    // can vary by finish, edition, and market; users should confirm their exact pen.
+    { brand: `Namiki`, name: `Emperor Collection`, nibs: [`F`, `M`, `B`], ko: `나미키 엠퍼러 컬렉션`, sourceUrl: `https://www.pilot-namiki.com/en/collection/emperor/` },
+    { brand: `Namiki`, name: `Yukari Royale Collection`, nibs: [`F`, `M`, `B`], ko: `나미키 유카리 로얄 컬렉션`, sourceUrl: `https://www.pilot-namiki.com/en/collection/yukari-royale/` },
+    { brand: `Namiki`, name: `Yukari Collection`, nibs: [`F`, `M`, `B`], ko: `나미키 유카리 컬렉션`, sourceUrl: `https://www.pilot-namiki.com/en/` },
+    { brand: `Nakaya`, name: `Cigar Portable`, nibs: [`F`, `M`, `B`], ko: `나카야 시가 포터블`, sourceUrl: `https://www.nakaya.org/en/products/search/` },
+    { brand: `Nakaya`, name: `Cigar Piccolo`, nibs: [`F`, `M`, `B`], ko: `나카야 시가 피콜로`, sourceUrl: `https://www.nakaya.org/en/products/info/36512/` },
+    { brand: `Nakaya`, name: `Decapod`, nibs: [`F`, `M`, `B`], ko: `나카야 데카포드`, sourceUrl: `https://www.nakaya.org/en/products/search/` },
+    { brand: `Taccia`, name: `Pinnacle`, nibs: [`EF`, `F`, `M`], ko: `타치아 피나클`, fillSystem: `카트리지/컨버터`, sourceUrl: `https://taccia.jp/en/detail/pinnacle-fountain-pen/` },
+    { brand: `Taccia`, name: `Facet`, nibs: [`EF`, `F`, `M`], ko: `타치아 패싯`, fillSystem: `카트리지/컨버터`, sourceUrl: `https://taccia.jp/detail/facet-fountain-pen/` },
+    { brand: `Taccia`, name: `Tamamizu Urushi`, nibs: [`EF`, `F`, `MF`, `M`, `B`, `Z`, `MS`], ko: `타치아 타마미즈 우루시`, fillSystem: `카트리지/컨버터`, sourceUrl: `https://taccia.jp/en/detail/tamamizu-urushi-fountain-pen/` },
+    { brand: `Diplomat`, name: `Aero`, nibs: [`EF`, `F`, `M`, `B`], ko: `디플로마트 에어로`, sourceUrl: `https://www.diplomat-pen.com/en/collections/` },
+    { brand: `Diplomat`, name: `Excellence A2`, nibs: [`EF`, `F`, `M`, `B`], ko: `디플로마트 엑설런스 A2`, sourceUrl: `https://www.diplomat-pen.com/en/collections/` },
+    { brand: `Diplomat`, name: `Traveller`, nibs: [`F`, `M`], ko: `디플로마트 트래블러`, sourceUrl: `https://www.diplomat-pen.com/en/collections/` },
+    { brand: `Otto Hutt`, name: `design04`, nibs: [`F`, `M`, `B`], ko: `오토후트 디자인 04`, sourceUrl: `https://oldwww.ottohutt.com/en/projects/design04/` },
+    { brand: `Otto Hutt`, name: `design06`, nibs: [`F`, `M`, `B`], ko: `오토후트 디자인 06`, sourceUrl: `https://oldwww.ottohutt.com/en/products/` },
+    { brand: `Graf von Faber-Castell`, name: `Classic`, nibs: [`F`, `M`, `B`], ko: `그라프 폰 파버카스텔 클래식`, sourceUrl: `https://www.graf-von-faber-castell.com/series-all-products/24-24-11-fountain-pen` },
+    { brand: `Graf von Faber-Castell`, name: `Guilloche`, nibs: [`F`, `M`, `B`], ko: `그라프 폰 파버카스텔 기요셰`, sourceUrl: `https://www.graf-von-faber-castell.com/series-all-products/24-24-11-fountain-pen` },
+    { brand: `Graf von Faber-Castell`, name: `Tamitio`, nibs: [`F`, `M`, `B`], ko: `그라프 폰 파버카스텔 타미티오`, sourceUrl: `https://www.graf-von-faber-castell.com/series-all-products/24-24-11-fountain-pen` },
+    { brand: `Leonardo`, name: `Momento Zero`, nibs: [`EF`, `F`, `M`, `B`], ko: `레오나르도 모멘토 제로`, sourceUrl: `https://leonardopen.com/collections/momento-zero-collection/fountain-pen-14kt-gold-nib` },
+    { brand: `Leonardo`, name: `Momento Zero Grande 2.0`, nibs: [`EF`, `F`, `M`, `B`], ko: `레오나르도 모멘토 제로 그란데 2.0`, sourceUrl: `https://leonardopen.com/collections` },
+    { brand: `Leonardo`, name: `Furore`, nibs: [`EF`, `F`, `M`, `B`], ko: `레오나르도 푸로레`, sourceUrl: `https://leonardopen.com/collections` },
+    { brand: `Montegrappa`, name: `Elmo 01`, nibs: [`EF`, `F`, `M`, `B`, `ST1`, `ST5`], ko: `몬테그라파 엘모 01`, fillSystem: `카트리지/컨버터`, sourceUrl: `https://www.montegrappa.com/en/collections/edizioni-regolari/elmo01-1041.html` },
+    { brand: `Montegrappa`, name: `Elmo 02`, nibs: [`EF`, `F`, `M`, `B`, `ST1`, `ST5`], ko: `몬테그라파 엘모 02`, fillSystem: `카트리지/컨버터`, sourceUrl: `https://www.montegrappa.com/en/collections/elmo-02/elmo-02-stilografica--cortina-1266.html` },
+    { brand: `Montegrappa`, name: `Extra 1930`, nibs: [`EF`, `F`, `M`, `B`], ko: `몬테그라파 엑스트라 1930`, sourceUrl: `https://www.montegrappa.com/en/luxury-pens` },
+    { brand: `Pineider`, name: `Avatar UR`, nibs: [`F`, `M`, `B`], ko: `피네이더 아바타 UR`, sourceUrl: `https://www.pineider.com/us/pens/collections/avatar` },
+    { brand: `Pineider`, name: `Avatar UR Mini`, nibs: [`F`, `M`, `B`], ko: `피네이더 아바타 UR 미니`, sourceUrl: `https://www.pineider.com/us/pens/collections/avatar` },
+    { brand: `Pineider`, name: `Arco`, nibs: [`F`, `M`, `B`], ko: `피네이더 아르코`, sourceUrl: `https://www.pineider.com/us/pens/fountain-pens` },
+    { brand: `S.T. Dupont`, name: `Initial`, nibs: [`M`], ko: `에스티듀퐁 이니셜`, sourceUrl: `https://us.st-dupont.com/products/fountain-pen-initial-270200` },
+    { brand: `Cross`, name: `Century II`, nibs: [`M`], ko: `크로스 센추리 2`, sourceUrl: `https://uk.cross.com/en-ie/collections/fountain-pen` },
+    { brand: `Cross`, name: `Bailey Light`, nibs: [`EF`, `F`], ko: `크로스 베일리 라이트`, sourceUrl: `https://uk.cross.com/en-ie/collections/fountain-pen` },
+    { brand: `Cross`, name: `Calais`, nibs: [`M`], ko: `크로스 칼레`, sourceUrl: `https://uk.cross.com/en-ie/collections/fountain-pen` },
+    { brand: `Caran d'Ache`, name: `849 Fountain Pen`, nibs: [`EF`, `F`, `M`, `B`], ko: `까렌다쉬 849 만년필`, sourceUrl: `https://www.carandache.com/content_files/pdf/B2B/brochure.pdf` },
+    { brand: `Conklin`, name: `Duragraph`, nibs: [`F`, `M`, `B`], ko: `콘클린 듀라그래프`, sourceUrl: `https://conklinpens.com/pages/duragraph` },
+    { brand: `Conklin`, name: `All American`, nibs: [`F`, `M`, `B`], ko: `콘클린 올 아메리칸`, sourceUrl: `https://conklinpens.com/collections/all-american/` },
+    { brand: `Sheaffer`, name: `100`, nibs: [`F`, `M`], ko: `쉐퍼 100`, fillSystem: `컨버터/카트리지`, sourceUrl: `https://sheaffer.com/products/sheaffer-100-e9313-glossy-black-barrelbrushed-chrome-capchrome-plated-trims-fountain-pen-fine` },
+    { brand: `Sheaffer`, name: `300`, nibs: [`F`, `M`, `B`], ko: `쉐퍼 300`, sourceUrl: `https://sheaffer.com/collections/fountain-pen?page=1` },
+    { brand: `Sheaffer`, name: `VFM`, nibs: [`F`, `M`], ko: `쉐퍼 VFM`, sourceUrl: `https://sheaffer.com/collections/fountain-pen?page=1` },
   ],
   K = ({ label: e, children: t, hint: n }) =>
     H(`label`, {
@@ -6557,7 +6595,7 @@ function Tr({ kind: e, onClose: t, prefill: n }) {
       !c &&
         H(b, {
           children: [
-            !a && H(`label`, {
+            H(`label`, {
               class: `field`,
               children: [
                 H(`span`, { class: `flabel`, children: `카탈로그 범위` }),
@@ -6583,7 +6621,7 @@ function Tr({ kind: e, onClose: t, prefill: n }) {
                   onChange: (event) => setCatalogBrand(event.target.value),
                   children: [
                     H(`option`, { value: ``, children: `전체 브랜드` }),
-                    [...new Set((catalogMode === `verified`
+                    [...new Set((a ? en : catalogMode === `verified`
                       ? LiveInkCatalog
                       : catalogMode === `brands`
                         ? AdditionalInkCatalog
@@ -6604,6 +6642,10 @@ function Tr({ kind: e, onClose: t, prefill: n }) {
               onInput: (e) => s(e.target.value),
               "aria-label": `카탈로그 검색`,
               autoFocus: !0,
+            }),
+            a && H(`p`, {
+              class: `hint`,
+              children: `브랜드별로 확인한 대표 제품 모델을 검색할 수 있어요. 모델명을 선택하고 닙을 고른 뒤 내 목록에 추가하세요. 카탈로그는 전체 색상·에디션을 망라하지 않으며, 닙 구성은 제품과 판매 지역에 따라 다를 수 있어요.`,
             }),
             !a && H(`p`, {
               class: `hint`,
@@ -6638,6 +6680,14 @@ function Tr({ kind: e, onClose: t, prefill: n }) {
                                 a ? e.nibs.join(`/`) : `${e.hue} · ${e.effect}`,
                               ],
                             }),
+                          ],
+                        }),
+                        a && e.sourceUrl && H(`p`, {
+                          class: `hint`,
+                          children: [
+                            e.fillSystem ? `${e.fillSystem} · ` : ``,
+                            `닙·색상 구성은 세부 모델과 판매 지역에 따라 달라질 수 있어요. `,
+                            H(`a`, { href: e.sourceUrl, target: `_blank`, rel: `noopener noreferrer`, children: `제조사 제품 정보` }),
                           ],
                         }),
                         !a && e.marketStatus && H(`p`, {
@@ -15156,7 +15206,7 @@ var ro = {
     [`inks`, `잉크`],
     [`pens`, `만년필`],
   ],
-  oo = `1.120.0`;
+  oo = `1.121.0`;
 function so({ message: e }) {
   return H(`main`, {
     class: `fatal`,
