@@ -4390,6 +4390,119 @@ var $t = [
         n && H(`span`, { class: `fhint`, children: n }),
       ],
     });
+var LiveInkCatalog = (() => {
+  let checkedAt = `2026-11-23`,
+    pilotUrl = `https://www.pencafe.co.kr/shop/shopdetail.html?GfDT=bm19W1pG&branduid=3492529&mcode=006&scode=&search=&xcode=165`,
+    sailorUrl = `https://www.pencafe.co.kr/shop/shopdetail.html?GfDT=bWd3UFQ%3D&branduid=1111425&current_category=103002&mcode=002&scode=&search=&sort=manual&type=X&xcode=103`,
+    sailorOfficialUrl = `https://shikiori-en.sailor.co.jp/ink-color-lineup/`,
+    pilotOfficialUrl = `https://www.pilotpen.co.kr/brand_iroshizuku.php`,
+    pilotNames = [
+      `Ajisai`, `Ama-iro`, `Asa-gao`, `Chiku-rin`, `Fuyu-gaki`, `Fuyu-syogun`,
+      `Hana-ikada`, `Hotaru-bi`, `Kon-peki`, `Ku-jaku`, `Momiji`, `Murasaki-shikibu`,
+      `Rikka`, `Shin-kai`, `Shin-ryoku`, `Sui-gyoku`, `Syo-ro`, `Syun-gyo`,
+      `Take-sumi`, `To-ro`, `Tsuki-yo`, `Yama-budo`, `Yama-guri`, `Yu-yake`,
+    ],
+    pilotHints = {
+      Ajisai: [`블루 & 터콰이즈`, `블루`],
+      "Hana-ikada": [`보라 & 핑크`, `핑크`],
+      "Hotaru-bi": [`옐로우 & 골드`, `옐로`],
+      "Shin-ryoku": [`그린 & 라임`, `그린`],
+      "Sui-gyoku": [`블루 & 터콰이즈`, `터콰이즈`],
+      Rikka: [`블루 & 터콰이즈`, `블루`],
+      "Syun-gyo": [`레드 / 오렌지 / 버건디 브라운`, `레드블랙`],
+      "To-ro": [`레드 / 오렌지 / 버건디 브라운`, `오렌지`],
+    },
+    pilot = pilotNames.map((name) => {
+      let existing = $t.find((entry) => entry.brand === `Pilot` && entry.name === `Iroshizuku ` + name),
+        [family, hue] = pilotHints[name] || [existing?.family || `미분류`, existing?.hue || `미확인`];
+      return {
+        ...(existing || {}),
+        brand: `Pilot`,
+        name: `Iroshizuku ` + name,
+        family,
+        hue,
+        effect: `Standard`,
+        ko: existing?.ko || `파일럿 이로시주쿠 ` + name,
+        series: `Iroshizuku`,
+        marketStatus: `한국 판매처 상품 목록 확인 · 색상별 재고는 판매처에서 확인`,
+        market: `KR`,
+        checkedAt,
+        sourceUrl: pilotUrl,
+        manufacturerUrl: pilotOfficialUrl,
+      };
+    }),
+    sailorColors = [
+      [`Shigure`, `블랙 & 그레이`, `퍼플`], [`Tokiwamatsu`, `그린 & 라임`, `그린`],
+      [`Nioisumire`, `보라 & 핑크`, `퍼플`], [`Miruai`, `그린 & 라임`, `그린`],
+      [`Souten`, `블루 & 터콰이즈`, `블루`], [`Doyou`, `브라운 / 카키 웜톤`, `브라운`],
+      [`Yamadori`, `블루 & 터콰이즈`, `터콰이즈`], [`Okuyama`, `레드 / 오렌지 / 버건디 브라운`, `버건디`],
+      [`Irori`, `레드 / 오렌지 / 버건디 브라운`, `레드`], [`Yukiakari`, `블루 & 터콰이즈`, `블루`],
+      [`Wakauguisu`, `그린 & 라임`, `그린`], [`Sakuramori`, `보라 & 핑크`, `핑크`],
+      [`Fujisugata`, `보라 & 핑크`, `퍼플`], [`Rikyucha`, `브라운 / 카키 웜톤`, `브라운`],
+      [`Kinmokusei`, `레드 / 오렌지 / 버건디 브라운`, `오렌지`], [`Chushu`, `블랙 & 그레이`, `그레이`],
+      [`Yozakura`, `보라 & 핑크`, `핑크`], [`Yodaki`, `레드 / 오렌지 / 버건디 브라운`, `브라운`],
+      [`Yonaga`, `블루 & 터콰이즈`, `블루블랙`], [`Shimoyo`, `블랙 & 그레이`, `그레이`],
+    ].map(([name, family, hue]) => ({
+      brand: `Sailor`,
+      name: `Shikiori ` + name,
+      family,
+      hue,
+      effect: `Standard`,
+      ko: `세일러 시키오리 ` + name,
+      series: `Shikiori`,
+      marketStatus: `한국 판매처 상품 목록 확인 · 색상별 재고는 판매처에서 확인`,
+      market: `KR`,
+      checkedAt,
+      sourceUrl: sailorUrl,
+      manufacturerUrl: sailorOfficialUrl,
+    }));
+  return [...pilot, ...sailorColors];
+})();
+var AdditionalInkCatalog = (() => {
+  let checkedAt = `2026-11-23`,
+    entry = (brand, name, series, family, hue, capacityMl, sourceUrl, manufacturerUrl, market) => ({
+      brand, name, series, family, hue, capacityMl,
+      effect: /shimmer/i.test(name) ? `Shimmer` : `Standard`,
+      marketStatus: `제조사/판매처 목록 확인 · 한국 내 판매 및 색상별 재고는 미확인`,
+      market, checkedAt, sourceUrl, manufacturerUrl,
+    }),
+    esterbrookUrl = `https://www.kenroindustries.com/portfolio/esterbrook-bottled-ink/`,
+    esterbrookOfficialUrl = `https://www.esterbrookpens.com/pages/introducing-esterbrooks-line-of-inks`,
+    pelikanEdelsteinUrl = `https://www.pelikan-passion.com/int/inks/edelstein`,
+    pelikan4001Url = `https://www.pelikan.com/images/assets/catalogs/2025/2025_CATALOGO_FWI.pdf`,
+    parkerUrl = `https://www.parkerpen.com/inks-refills/parker-inks-refills/ink-bottles-for-fountain-pens/parker-ink-bottle/SP_1417120.html`,
+    entries = [
+      ...[
+        [`Aqua`, `블루 & 터콰이즈`, `아쿠아`], [`Cobalt Blue`, `블루 & 터콰이즈`, `코발트 블루`],
+        [`Ebony`, `블랙 & 그레이`, `블랙`], [`Evergreen`, `그린 & 라임`, `그린`],
+        [`Scarlet`, `레드 / 오렌지 / 버건디 브라운`, `레드`], [`Tangerine`, `레드 / 오렌지 / 버건디 브라운`, `오렌지`],
+        [`Shimmer Aqua`, `블루 & 터콰이즈`, `아쿠아`], [`Shimmer Lilac`, `보라 & 핑크`, `라일락`],
+        [`Shimmer Tangerine`, `레드 / 오렌지 / 버건디 브라운`, `오렌지`],
+      ].map(([name, family, hue]) => entry(`Esterbrook`, name, `Esterbrook Ink`, family, hue, 50, esterbrookUrl, esterbrookOfficialUrl, `US`)),
+      ...[
+        [`Onyx`, `블랙 & 그레이`, `블랙`, `Edelstein`], [`Tanzanite`, `블루 & 터콰이즈`, `블루블랙`, `Edelstein`],
+        [`Sapphire`, `블루 & 터콰이즈`, `블루`, `Edelstein`], [`Topaz`, `블루 & 터콰이즈`, `터콰이즈`, `Edelstein`],
+        [`Jade`, `그린 & 라임`, `그린`, `Edelstein`], [`Aventurine`, `그린 & 라임`, `그린`, `Edelstein`],
+        [`Mandarin`, `레드 / 오렌지 / 버건디 브라운`, `오렌지`, `Edelstein`], [`Garnet`, `레드 / 오렌지 / 버건디 브라운`, `레드`, `Edelstein`],
+        [`Pyrite`, `옐로우 & 골드`, `골드그레이 쉬머`, `Edelstein Ink of the Year 2026`],
+        [`Apricot Achat`, `레드 / 오렌지 / 버건디 브라운`, `살구`, `Edelstein Ink of the Year 2025`],
+        [`Golden Lapis`, `블루 & 터콰이즈`, `블루 골드 쉬머`, `Edelstein Ink of the Year 2024`],
+        [`Rose Quartz`, `보라 & 핑크`, `핑크`, `Edelstein Ink of the Year 2023`],
+        [`Apatite`, `블루 & 터콰이즈`, `터콰이즈`, `Edelstein Ink of the Year 2022`],
+      ].map(([name, family, hue, series]) => entry(`Pelikan`, name, series, family, hue, 50, pelikanEdelsteinUrl, pelikanEdelsteinUrl, `DE`)),
+      ...[
+        [`Royal Blue`, `블루 & 터콰이즈`, `블루`], [`Blue-Black`, `블루 & 터콰이즈`, `블루블랙`],
+        [`Brilliant Black`, `블랙 & 그레이`, `블랙`], [`Brilliant Red`, `레드 / 오렌지 / 버건디 브라운`, `레드`],
+        [`Dark-Green`, `그린 & 라임`, `그린`], [`Brilliant Brown`, `브라운 / 카키 웜톤`, `브라운`],
+        [`Violet`, `보라 & 핑크`, `퍼플`], [`Turquoise`, `블루 & 터콰이즈`, `터콰이즈`], [`Pink`, `보라 & 핑크`, `핑크`],
+      ].map(([name, family, hue]) => entry(`Pelikan`, name, `4001`, family, hue, 30, pelikan4001Url, pelikan4001Url, `DE`)),
+      ...[
+        [`Black`, `블랙 & 그레이`, `블랙`], [`Blue-Black`, `블루 & 터콰이즈`, `블루블랙`],
+        [`Washable Blue`, `블루 & 터콰이즈`, `블루`],
+      ].map(([name, family, hue]) => entry(`Parker`, `QUINK ${name}`, `QUINK`, family, hue, 57, parkerUrl, parkerUrl, `KR/US/UK`)),
+    ];
+  return entries;
+})();
 function q({ value: e, onChange: t, options: n, name: r, id: i }) {
   let a = n.map((e) => (Array.isArray(e) ? e : [e, e])),
     o =
@@ -6264,14 +6377,31 @@ function Tr({ kind: e, onClose: t, prefill: n }) {
     [extractingColor, setExtractingColor] = R(!1),
     [colorMessage, setColorMessage] = R(null),
     [pendingColorAdd, setPendingColorAdd] = R(null),
+    [catalogPrefill, setCatalogPrefill] = R(null),
+    [catalogMode, setCatalogMode] = R(`verified`),
+    [catalogBrand, setCatalogBrand] = R(``),
     g = (e) => (t) => h({ ...m, [e]: t }),
     _ = a ? r.state.pens : r.state.inks,
     v = B(
-      () =>
-        (a ? en : $t)
-          .filter((e) => Et(o, [e.brand, e.name, e.ko]))
-          .slice(0, 30),
-      [o, a],
+      () => {
+        let candidates = a
+          ? en
+          : catalogMode === `verified`
+            ? LiveInkCatalog
+            : catalogMode === `brands`
+              ? AdditionalInkCatalog
+            : [
+                ...LiveInkCatalog,
+                ...AdditionalInkCatalog.filter((entry) => !LiveInkCatalog.some((current) =>
+                  V(current.brand) === V(entry.brand) && V(current.name) === V(entry.name))),
+                ...$t.filter((entry) => !LiveInkCatalog.some((current) =>
+                  V(current.brand) === V(entry.brand) && V(current.name) === V(entry.name))
+                  && !AdditionalInkCatalog.some((current) =>
+                    V(current.brand) === V(entry.brand) && V(current.name) === V(entry.name))),
+              ];
+        return candidates.filter((entry) => (!catalogBrand || entry.brand === catalogBrand) && Et(o, [entry.brand, entry.name, entry.ko])).slice(0, 30);
+      },
+      [o, a, catalogMode, catalogBrand],
     ),
     y = (e, t) => _.some((n) => V(n.brand) === V(e) && V(n.name) === V(t)),
     colorMatches = !a && Cn(m.colorHex)
@@ -6334,24 +6464,24 @@ function Tr({ kind: e, onClose: t, prefill: n }) {
       fillDate: ``,
       notes: r,
     }),
-    C = (e, t) =>
-      x(
-        a
-          ? S(e.brand, e.name, t || e.nibs[0])
-          : {
-              brand: e.brand,
-              name: e.name,
-              family: e.family,
-              hue: e.hue,
-              ...(Cn(e.colorHex) ? { colorHex: e.colorHex.toLowerCase(), colorSource: `catalog` } : {}),
-              effect: e.effect,
-              flow: ``,
-              packageType: `bottle`,
-              capacityMl: null,
-              remainingMl: null,
-              notes: ``,
-            },
-      );
+    C = (e, t) => {
+      if (!a) {
+        h({
+          ...wr,
+          brand: e.brand || ``,
+          name: e.name || ``,
+          family: e.family || ``,
+          hue: e.hue || wr.hue,
+          ...(Cn(e.colorHex) ? { colorHex: e.colorHex.toLowerCase(), colorSource: `catalog` } : {}),
+          effect: e.effect || `Standard`,
+          packageType: `bottle`,
+          capacityMl: e.capacityMl || ``,
+        });
+        (setCatalogPrefill(e), setPendingColorAdd(null), l(!0));
+        return;
+      }
+      return x(S(e.brand, e.name, t || e.nibs[0]));
+    };
   function w(e) {
     e.preventDefault();
     let t = m.brand.trim(),
@@ -6390,6 +6520,13 @@ function Tr({ kind: e, onClose: t, prefill: n }) {
       capacityMl: i,
       remainingMl: null,
       notes: m.notes.trim(),
+      ...(catalogPrefill?.marketStatus ? {
+        catalogSeries: catalogPrefill.series,
+        catalogMarket: catalogPrefill.market,
+        catalogCheckedAt: catalogPrefill.checkedAt,
+        catalogSourceUrl: catalogPrefill.sourceUrl,
+        catalogManufacturerUrl: catalogPrefill.manufacturerUrl,
+      } : {}),
       ...o,
     };
     return x(newInk);
@@ -6401,6 +6538,43 @@ function Tr({ kind: e, onClose: t, prefill: n }) {
       !c &&
         H(b, {
           children: [
+            !a && H(`label`, {
+              class: `field`,
+              children: [
+                H(`span`, { class: `flabel`, children: `카탈로그 범위` }),
+                H(`select`, {
+                  class: `input`,
+                  value: catalogMode,
+                  onChange: (event) => setCatalogMode(event.target.value),
+                  children: [
+                    H(`option`, { value: `verified`, children: `한국 판매처 상품 목록 확인 · Pilot 24종 + Sailor 20종` }),
+                    H(`option`, { value: `brands`, children: `추가 브랜드 목록 · Esterbrook, Pelikan, Parker` }),
+                    H(`option`, { value: `all`, children: `전체 입력 후보 · 판매 상태 미확인 포함` }),
+                  ],
+                }),
+              ],
+            }),
+            !a && H(`label`, {
+              class: `field`,
+              children: [
+                H(`span`, { class: `flabel`, children: `브랜드` }),
+                H(`select`, {
+                  class: `input`,
+                  value: catalogBrand,
+                  onChange: (event) => setCatalogBrand(event.target.value),
+                  children: [
+                    H(`option`, { value: ``, children: `전체 브랜드` }),
+                    [...new Set((catalogMode === `verified`
+                      ? LiveInkCatalog
+                      : catalogMode === `brands`
+                        ? AdditionalInkCatalog
+                        : [...LiveInkCatalog, ...AdditionalInkCatalog, ...$t]).map((entry) => entry.brand))]
+                      .sort((first, second) => first.localeCompare(second))
+                      .map((brand) => H(`option`, { value: brand, children: brand }, brand)),
+                  ],
+                }),
+              ],
+            }),
             H(`input`, {
               class: `input`,
               type: `search`,
@@ -6411,6 +6585,14 @@ function Tr({ kind: e, onClose: t, prefill: n }) {
               onInput: (e) => s(e.target.value),
               "aria-label": `카탈로그 검색`,
               autoFocus: !0,
+            }),
+            !a && H(`p`, {
+              class: `hint`,
+              children: catalogMode === `verified`
+                ? `상품 페이지에서 색상 선택 상품이 확인된 목록이에요. 재고와 판매 지역은 판매처에서 확인해 주세요. 제품을 고르면 내 목록에 추가하기 전에 정보를 고칠 수 있어요.`
+                : catalogMode === `brands`
+                  ? `제조사·판매처 카탈로그에서 확인한 제품 후보예요. 한국 판매 및 색상별 재고는 확인하지 못했어요. 용량도 확인한 뒤 내 목록에 추가해 주세요.`
+                  : `이 목록에는 판매 여부를 확인하지 못한 기존 입력 후보도 포함돼요. 제품을 고르면 내 목록에 추가하기 전에 정보를 고칠 수 있어요.`,
             }),
             H(`ul`, {
               class: `results`,
@@ -6437,6 +6619,17 @@ function Tr({ kind: e, onClose: t, prefill: n }) {
                                 a ? e.nibs.join(`/`) : `${e.hue} · ${e.effect}`,
                               ],
                             }),
+                          ],
+                        }),
+                        !a && e.marketStatus && H(`p`, {
+                          class: `hint`,
+                          children: [
+                            e.marketStatus,
+                            ` · 확인 ${e.checkedAt}`,
+                            ` · `,
+                            H(`a`, { href: e.sourceUrl, target: `_blank`, rel: `noopener noreferrer`, children: `판매처 상품 페이지` }),
+                            ` · `,
+                            H(`a`, { href: e.manufacturerUrl, target: `_blank`, rel: `noopener noreferrer`, children: `제조사 라인업` }),
                           ],
                         }),
                         u === e &&
@@ -6474,7 +6667,7 @@ function Tr({ kind: e, onClose: t, prefill: n }) {
             H(`button`, {
               class: `btn outline`,
               type: `button`,
-              onClick: () => l(!0),
+              onClick: () => (setCatalogPrefill(null), l(!0)),
               children: `직접 입력`,
             }),
           ],
@@ -6489,6 +6682,15 @@ function Tr({ kind: e, onClose: t, prefill: n }) {
                 class: `ai-note`,
                 children: `📷 사진에서 읽은 내용이에요. AI는 틀릴 수 있으니 확인하고 고쳐 주세요.`,
               }),
+            catalogPrefill && H(`p`, {
+              class: `ai-note`,
+              id: `catalogEditNotice`,
+              children: [
+                `카탈로그 정보를 불러왔어요. 실제 제품과 다르면 고친 뒤 내 잉크 목록에 추가하세요. 수정은 개인 목록에만 반영되고 기본 카탈로그는 바뀌지 않아요.`,
+                catalogPrefill.marketStatus && ` ${catalogPrefill.marketStatus} (확인 ${catalogPrefill.checkedAt})`,
+                catalogPrefill.sourceUrl && H(`a`, { href: catalogPrefill.sourceUrl, target: `_blank`, rel: `noopener noreferrer`, children: ` 목록 출처` }),
+              ],
+            }),
             H(K, {
               label: `브랜드`,
               children: H(`input`, {
@@ -6688,7 +6890,7 @@ function Tr({ kind: e, onClose: t, prefill: n }) {
               class: `btn primary`,
               type: `submit`,
               id: `addSubmit`,
-              children: `추가`,
+              children: a ? `만년필 추가` : catalogPrefill ? `확인하고 내 잉크에 추가` : `추가`,
             }),
             !n &&
               H(`button`, {
@@ -10114,9 +10316,14 @@ function hi() {
   });
 }
 function gi() {
-  let { c: e } = U(),
+  let { c: e, go: goTo } = U(),
     { pens: t, inks: n } = e.state,
-    [r, i] = R(null);
+    [r, i] = R(null),
+    [driveChoice, setDriveChoice] = R(!1);
+  z(() => {
+    if (t.length || n.length) { setDriveChoice(!1); return; }
+    e.store.getMeta(`driveChoiceAsked`).then((asked) => setDriveChoice(!asked));
+  }, [e, t.length, n.length]);
   return t.length && n.length
     ? null
     : H(`div`, {
@@ -10137,7 +10344,19 @@ function gi() {
           }),
           H(`p`, {
             class: `hint`,
-            children: `🔒 데이터는 이 기기에만 저장되고 외부로 나가지 않아요. 백업(JSON·엑셀)으로 언제든 내보내거나 지울 수 있어요.`,
+            children: `🔒 기본 데이터는 이 기기에 저장돼요. Google Drive 동기화는 원할 때 직접 연결한 뒤에만 시작됩니다.`,
+          }),
+          driveChoice && H(`div`, {
+            class: `notice stack`,
+            id: `firstUseDriveChoice`,
+            children: [
+              H(`b`, { children: `기기 간 동기화도 설정할까요?` }),
+              H(`p`, { class: `hint`, children: `선택 사항이에요. Google 계정으로 연결하면 앱 전용 숨김 폴더에 기록을 동기화할 수 있어요. 연결하지 않아도 이 기기에서 계속 사용할 수 있고, 나중에 백업·복원에서 바꿀 수 있어요.` }),
+              H(`div`, { class: `row2`, children: [
+                H(`button`, { class: `btn primary`, type: `button`, onClick: async () => { await e.store.setMeta(`driveChoiceAsked`, !0); setDriveChoice(!1); goTo && goTo(`data`); }, children: `Drive 동기화 설정` }),
+                H(`button`, { class: `btn outline`, type: `button`, onClick: async () => { await e.store.setMeta(`driveChoiceAsked`, !0); setDriveChoice(!1); }, children: `이 기기에서만 사용` }),
+              ] }),
+            ],
           }),
           H(`ol`, {
             children: [
@@ -13681,8 +13900,8 @@ var Ya = (e) => {
   },
   Xa = (e, t) => Object.values(e).reduce((e, n) => e + n[t], 0);
 function Za({ clientId: e = wa, tokenManager: t }) {
-  let { c: n, photos: r, toast: i } = U(),
-    a = B(() => t || ja({ clientId: e }), [e, t]),
+  let { c: n, photos: r, toast: i, driveToken: sharedDriveToken, driveStatus } = U(),
+    a = B(() => t || sharedDriveToken || ja({ clientId: e }), [e, t, sharedDriveToken]),
     o = B(() => Ia({ getToken: () => a.ensure() }), [a]),
     [s, c] = R({ connected: !1, last: 0, canUndo: !1 }),
     [l, u] = R(!1),
@@ -13698,6 +13917,9 @@ function Za({ clientId: e = wa, tokenManager: t }) {
   if (
     (z(() => {
       p();
+      let syncDone = () => p();
+      window.addEventListener(`pil-drive-sync-complete`, syncDone);
+      return () => window.removeEventListener(`pil-drive-sync-complete`, syncDone);
     }, []),
     !Ea(e))
   )
@@ -13705,9 +13927,11 @@ function Za({ clientId: e = wa, tokenManager: t }) {
   async function m() {
     (u(!0), f({ t: `동기화하는 중…`, k: `` }));
     try {
-      (await a.ensure(), await n.store.setMeta(`driveConnected`, !0));
+      (await a.ensure(), await n.store.setMeta(`driveConnected`, !0), await n.store.setMeta(`driveChoiceAsked`, !0));
       let e = await Ka({ store: n.store, photos: r, drive: o });
       (await n.reload(), await p());
+      window.dispatchEvent(new CustomEvent(`pil-drive-sync-complete`));
+      window.dispatchEvent(new CustomEvent(`pil-drive-connection-changed`));
       let t = e.counts,
         s = (e, n) =>
           `${e}: 기기 ${t.local[n]} · 드라이브 ${t.remote[n]} → 합친 뒤 ${t.merged[n]}`,
@@ -13750,6 +13974,7 @@ function Za({ clientId: e = wa, tokenManager: t }) {
   async function h() {
     (a.revoke(),
       await n.store.setMeta(`driveConnected`, !1),
+      window.dispatchEvent(new CustomEvent(`pil-drive-connection-changed`)),
       await p(),
       f({
         t: `연결을 해제했어요. 이 기기의 데이터와 드라이브에 올려 둔 데이터는 그대로예요.`,
@@ -13818,6 +14043,7 @@ function Za({ clientId: e = wa, tokenManager: t }) {
           Ya(s.last),
         ],
       }),
+      driveStatus && H(`p`, { class: `ai-msg`, id: `driveAutoStatus`, role: `status`, children: driveStatus }),
       H(`button`, {
         class: `btn primary`,
         type: `button`,
@@ -13871,7 +14097,7 @@ function Za({ clientId: e = wa, tokenManager: t }) {
         children: [
           `기기마다 같은 구글 계정으로 연결하세요. 두 기기에서 같은 항목을 고치면 `,
           H(`b`, { children: `나중에 고친 쪽` }),
-          `이 남아요(항목별). 앱을 쓴 뒤 “지금 동기화”를 눌러 주세요(자동으로 올리지 않아요).`,
+          `이 남아요(항목별). 연결된 동안에는 변경 후와 앱으로 돌아왔을 때 자동 동기화해요. 브라우저를 새로 열었거나 권한이 만료되면 보안을 위해 “지금 동기화”를 눌러 다시 확인해 주세요.`,
         ],
       }),
     ],
@@ -14805,7 +15031,7 @@ var ro = {
     [`inks`, `잉크`],
     [`pens`, `만년필`],
   ],
-  oo = `1.115.1`;
+  oo = `1.119.0`;
 function so({ message: e }) {
   return H(`main`, {
     class: `fatal`,
@@ -14835,8 +15061,69 @@ function co() {
     t
   );
 }
+function DriveAutoSync({ c, photos, auth, onStatus }) {
+  let running = ft(!1), baseline = ft(``), timer = ft(null);
+  z(() => {
+    if (!Ea(wa)) return;
+    let active = !0, connected = !1;
+    baseline.current = Ua(F.map((kind) => c.state[kind]));
+    async function sync(reason) {
+      if (!active || !connected || running.current) return;
+      if (!auth.hasToken()) {
+        onStatus(`Drive 연결은 켜져 있어요. 이 앱을 새로 열었거나 권한이 만료된 경우 ‘지금 동기화’를 눌러 다시 확인해 주세요.`);
+        return;
+      }
+      running.current = !0;
+      onStatus(reason === `change` ? `변경 사항을 Drive에 동기화하고 있어요…` : `Drive 변경 사항을 확인하고 있어요…`);
+      try {
+        await Ka({ store: c.store, photos, drive: Ia({ getToken: () => auth.ensure() }) });
+        await c.reload();
+        baseline.current = Ua(F.map((kind) => c.state[kind]));
+        onStatus(`자동 동기화 완료 · ${Ya(Date.now())}`);
+        window.dispatchEvent(new CustomEvent(`pil-drive-sync-complete`));
+      } catch (error) {
+        onStatus(`자동 동기화를 완료하지 못했어요. 백업·복원에서 다시 동기화해 주세요. (${error.message || `연결 오류`})`);
+      } finally {
+        running.current = !1;
+      }
+    }
+    async function checkConnection(syncNow = !1) {
+      connected = !!(await c.store.getMeta(`driveConnected`));
+      if (connected && syncNow) sync(`foreground`);
+      else if (!connected) onStatus(``);
+    }
+    let unsubscribe = c.subscribe(() => {
+      if (!connected || running.current) return;
+      let next = Ua(F.map((kind) => c.state[kind]));
+      if (next === baseline.current) return;
+      baseline.current = next;
+      clearTimeout(timer.current);
+      timer.current = setTimeout(() => sync(`change`), 1200);
+    });
+    let onVisibility = () => {
+        if (document.visibilityState === `visible`) checkConnection(!0);
+      },
+      onOnline = () => checkConnection(!0),
+      onConnection = () => checkConnection(!1);
+    document.addEventListener(`visibilitychange`, onVisibility);
+    window.addEventListener(`online`, onOnline);
+    window.addEventListener(`pil-drive-connection-changed`, onConnection);
+    checkConnection(!0);
+    return () => {
+      active = !1;
+      clearTimeout(timer.current);
+      unsubscribe();
+      document.removeEventListener(`visibilitychange`, onVisibility);
+      window.removeEventListener(`online`, onOnline);
+      window.removeEventListener(`pil-drive-connection-changed`, onConnection);
+    };
+  }, [c, photos, auth]);
+  return null;
+}
 function lo({ c: e, photos: t }) {
   let n = Tt(e, t),
+    driveToken = B(() => ja({ clientId: wa }), []),
+    [driveStatus, setDriveStatus] = R(``),
     r = co(),
     [i, a] = R(() => {
       let e = location.hash.slice(1);
@@ -14901,10 +15188,11 @@ function lo({ c: e, photos: t }) {
         e,
       );
   return H(wt.Provider, {
-    value: { c: e, photos: t, toast: p, go: f, nav: o },
+    value: { c: e, photos: t, toast: p, go: f, nav: o, driveToken, driveStatus },
     children: H(`div`, {
       class: `app`,
       children: [
+        H(DriveAutoSync, { c: e, photos: t, auth: driveToken, onStatus: setDriveStatus }),
         H(`aside`, {
           class: `sidebar`,
           id: `sidebar`,
@@ -14962,7 +15250,7 @@ function lo({ c: e, photos: t }) {
                     n.lastBackup
                       ? `마지막 백업 ${h === 0 ? `오늘` : h + `일 전`}`
                       : `아직 백업한 적이 없어요`,
-                    ` · 데이터는 이 기기에만 저장돼요.`,
+                    ` · 데이터는 기기에 저장되며, 선택하면 Drive와 동기화돼요.`,
                   ],
                 }),
                 H(`button`, {
