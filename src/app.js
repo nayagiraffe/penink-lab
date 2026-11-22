@@ -15206,7 +15206,7 @@ var ro = {
     [`inks`, `잉크`],
     [`pens`, `만년필`],
   ],
-  oo = `1.121.1`;
+  oo = `1.121.2`;
 function so({ message: e }) {
   return H(`main`, {
     class: `fatal`,

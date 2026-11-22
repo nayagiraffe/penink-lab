@@ -1,9 +1,9 @@
 /* Pen & Ink Lab 서비스 워커. 사용자 데이터(IndexedDB)는 건드리지 않는다. */
-const CACHE = "pil2-v1.121.1-recovered-source";
+const CACHE = "pil2-v1.121.2-recovered-source";
 const ASSETS = [
   "./",
-  "./assets/app.css",
-  "./assets/app.js",
+  "./assets/app.css?v=1.121.2",
+  "./assets/app.js?v=1.121.2",
   "./icons/favicon-32.png",
   "./icons/favicon-64.png",
   "./icons/icon-180.png",
@@ -21,7 +21,14 @@ self.addEventListener("install", (e) => {
   e.waitUntil(
     caches
       .open(CACHE)
-      .then((c) => c.addAll(ASSETS))
+      .then(async (c) => {
+        await Promise.all(ASSETS.map(async (asset) => {
+          const request = new Request(new URL(asset, self.registration.scope), { cache: "reload" });
+          const response = await fetch(request);
+          if (!response.ok) throw new Error(`Failed to cache ${asset}: ${response.status}`);
+          await c.put(request, response);
+        }));
+      })
       .then(() => self.skipWaiting()),
   );
 });
