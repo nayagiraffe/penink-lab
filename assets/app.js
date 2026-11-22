@@ -4462,8 +4462,10 @@ var AdditionalInkCatalog = (() => {
   let checkedAt = `2026-11-23`,
     entry = (brand, name, series, family, hue, capacityMl, sourceUrl, manufacturerUrl, market) => ({
       brand, name, series, family, hue, capacityMl,
-      effect: /shimmer/i.test(name) ? `Shimmer` : `Standard`,
-      marketStatus: `제조사/판매처 목록 확인 · 한국 내 판매 및 색상별 재고는 미확인`,
+      effect: /shimmer|glitter|글리터/i.test(name) ? `Shimmer` : `Standard`,
+      marketStatus: market === `KR`
+        ? `한국 공식몰 상품 페이지 확인 · 실시간 재고는 출처에서 확인`
+        : `제조사/판매처 목록 확인 · 한국 내 판매 및 색상별 재고는 미확인`,
       market, checkedAt, sourceUrl, manufacturerUrl,
     }),
     esterbrookUrl = `https://www.kenroindustries.com/portfolio/esterbrook-bottled-ink/`,
@@ -4500,8 +4502,25 @@ var AdditionalInkCatalog = (() => {
         [`Black`, `블랙 & 그레이`, `블랙`], [`Blue-Black`, `블루 & 터콰이즈`, `블루블랙`],
         [`Washable Blue`, `블루 & 터콰이즈`, `블루`],
       ].map(([name, family, hue]) => entry(`Parker`, `QUINK ${name}`, `QUINK`, family, hue, 57, parkerUrl, parkerUrl, `KR/US/UK`)),
+    ],
+    listed = (brand, names, series, capacityMl, sourceUrl, manufacturerUrl, market) => names.map((name) => {
+      let previous = $t.find((item) => V(item.brand) === V(brand) && V(item.name) === V(name));
+      return entry(brand, name, series, previous?.family || `미분류`, previous?.hue || `미확인`, capacityMl, sourceUrl, manufacturerUrl, market);
+    }),
+    surveyed = [
+      ...listed(`Wearingeul`, [`오페라의 유령`, `걸리버 여행기`, `공포의 계곡`, `엠마`, `해저 2만 리`, `연옥`, `드라큘라`, `웬디 달링`, `비밀의 화원`, `백야`, `꿈속의 꿈`, `천국`, `오만과 편견`, `수레바퀴 아래서`, `나르치스와 골드문트`, `고자질하는 심장`, `별 아이`, `부활`, `앨리스`, `빛 죽은 반달`, `포도빛 밤`, `지옥`, `페르세포네`, `프랑켄슈타인`, `제천대성`, `행인`, `1984`, `카라마조프가의 형제들`, `별빛이 나린 언덕`, `살로메`, `죄와 벌`].map((name) => `${name} (문학 잉크)`), `문학 잉크 · 일반`, 30, `https://wearingeul.kr/ink_standard`, `https://wearingeul.kr/ink`, `KR`),
+      ...listed(`Montblanc`, [`Mystery Black`, `Royal Blue`, `Midnight Blue`, `Permanent Black`, `Permanent Blue`, `Burgundy Red`, `Modena Red`, `Amethyst Purple`, `Irish Green`, `Cool Gray`, `Manganese Orange`, `Toffee Brown`, `Pop Pink`, `The Legend of Zodiacs The Goat · Red`, `Writers Edition Homage to Bram Stoker · Purple`, `Meisterstück Romeo & Juliet · Verona Red`, `Masters of Art Homage to Pierre-Auguste Renoir · Bleu Outremer`, `StarWalker Extreme · Blaze Orange`, `Great Characters Homage to Queen · Red`, `Great Characters Homage to Bruce Lee · Dragon Smoke`, `Happy Holidays Scented Ink · Gingerbread Orange`, `Happy Holidays Scented Ink · Scots Pine Green`], `Ink Bottle`, 60, `https://www.montblanc.com/en-hk/refills-stationery/refills/fountain-pen`, `https://www.montblanc.com/en-hk/refills-stationery/refills/fountain-pen`, `HK`),
+      ...listed(`Leonardo`, [`Viola Profondo`, `Purple Diamond Shimmer`, `Petrol + Diamond Shimmer`, `Lilac + Bright Silver Shimmer`, `Boreale Shimmer`, `Shocking Pink`, `Apple Green`, `Verde Foresta`, `Turchese`, `Sepia Classico`, `Rosso Passione`, `Grigio Roccia`, `Blue/Black`, `Arancio Caldo`, `Noce Moscata`, `Smeraldo Duro`, `Asa Blu`, `Nero Intenso`, `Taurasi Riserva`, `Leonardo Ink 40ml · 색상 미표기`], `Leonardo bottled ink`, 40, `https://www.stilografica.it/en/ink-bottles?brand=caran-d-ache&brand=leonardo-officina-italiana`, `https://www.stilografica.it/en/products/leonardo-officina-italiana`, `IT`),
+      ...listed(`Kobe`, [`No.1 Rokko Green`, `No.2 Hatoba Blue`, `No.3 Kyukyoryuchi Sepia`, `No.4 Kitano Ijinkan Red`, `No.5 Toa Black`, `No.6 Kobe Bordeaux`, `No.7 Kaikyo Blue`, `No.8 Arima Amber`, `No.9 Suma Purple`, `No.10 Mikage Gray`, `No.11 Ikuta Orange`, `No.12 Okamoto Pink`, `No.13 Nunobiki Emerald`, `No.14 Maya Lapis`, `No.15 Maiko Green`, `No.16 Nada Brown`, `No.17 Shioya Blue`, `No.18 Sannomiya Pansy`, `No.19 Minatogawa Lime`, `No.20 Motomachi Rouge`, `No.21 Taisanji Yellow`, `No.22 Shinkaichi Gold`, `No.23 Nagata Blue`, `No.24 Nakayamate Black`, `No.25 Tarumi Apricot`, `No.26 Wadamisaki Blue`, `No.27 Konan Maroon`, `No.28 Suzuran Green`, `No.29 Sumakaihin Blue`, `No.30 Oji Cherry`, `No.31 Kaigan Stone Gray`, `No.32 Tamon Purple Gray`, `No.33 Rikyu Moon Yellow`, `No.34 Sorakuen Tea Green`, `No.35 Suwayama Leaf Green`, `No.36 Sakaemachi Indigo`, `No.37 Minatojima Island Blue`, `No.38 Kitanozaka Night Blue`, `No.39 Kobe Renga`, `No.40 Sumiyoshi Brown`, `No.41 Sumarikyu Rose`, `No.42 Rokko Island Sky`, `No.43 Gakuentoshi Fresh Green`, `No.44 Sumaura Seaside Blue`, `No.45 Hachibuse Silhouette Green`, `No.46 Nagisa Museum Gray`, `No.47 Aotani Cascade Green`, `No.48 Suidosuji Marche Blue`, `No.49 Kitano Olive Green`, `No.50 Kyomachi Legend Blue`, `No.51 Kanocho Midnight`, `No.52 Shioya Vintage Sepia`, `No.53 Kitano Pearl Silver`, `No.54 Goshikiyama Ocher`, `No.55 Nankinmachi Fortune Red`, `No.56 Rokko Shichidanka`, `No.57 Kobe Himeajisai`, `No.58 Hyogo Canal Blue`, `No.59 Hiranogion Romance Gray`, `No.60 Kobe Ijinkan Mint`, `No.61 Yukinogosyo Sakura`, `No.62 Nunobiki Lavender`, `No.63 Higashiyuenchi Torch Orange`, `No.64 Sumiyoshiyamate Jade Green`, `No.65 Shinko Jet Black`, `No.66 Seishin Cobalt Sky`, `No.67 Ogo Farm Green`, `No.68 Nishimaiko Pearl Blue`, `No.69 Kikusui Biotope`, `No.70 Rokko Forest Blue`, `No.71 Ikutagawa Sakura`, `No.72 Sengari Water Blue`, `No.73 Hyogotsu History Blue`, `No.74 Myodani Cosmos Red`, `No.75 Higashikawasaki Harbor Mint`, `No.76 Futatabisan Park Tree`, `No.77 Rokko Himalayan Blue`, `No.78 Rokko Alps Pink`, `No.79 Tamon Kakitsubata`, `No.80 Rokkokouzan Kurinso`, `No.81 Fukae Urban Blue`, `No.82 Maya Kaigan Apple Green`, `No.83 Koikawa Ipe Yellow`, `No.84 Yamamotodori Exotic Green`, `No.85 Maiko Promenade Blue`, `No.86 Kanocho Shadow Gray`, `No.87 Hyogo Pansy`, `No.88 Nagata Pure Gold`], `Kobe INK Monogatari`, 50, `https://kobe-nagasawa.com/collections/kobe_ink_monogatari`, `https://kobe-nagasawa.pro/catalog/en/`, `JP`),
+      ...listed(`Sailor`, [`Haha`, `Yomogi`, `Sumire`, `Kikyou`, `Nekoyanagi`, `Akebi`, `Kuzu`, `Yamabuki`, `Sakura`, `Ume`, `Nadeshiko`, `Konagi`, `Kakitsubata`, `Ukikusa`, `Shirakashi`, `Chigaya`, `Ayame`, `Hinoki`, `Fuji`, `Koke`, `Sumomo`, `Nagi`, `Budo`, `Kuri`, `Azuki`, `Aka-mai`, `Takenoko`, `Kaki`, `Uri`, `Nobiru`].map((name) => `MANYO ${name}`), `MANYO`, 50, `https://en.sailor.co.jp/product/13-2009/`, `https://en.sailor.co.jp/product/13-2009/`, `JP`),
+      ...listed(`Diamine`, [`Writers Blood`, `Onyx Black`, `Oxford Blue`, `Jet Black`, `Lady Grey`, `Oxblood`, `Aurora Borealis`, `Monboddo's Hat`, `Ancient Copper`, `Red Dragon`, `Celadon Cat`, `Sherwood Green`, `Imperial Purple`, `Earl Grey`, `Sapphire Blue`, `Royal Blue`, `Sargasso Sea`, `Blue Black`, `Twilight`, `Green Black`, `Emerald`, `Tobacco Sunburst`, `Poppy Red`, `Eclipse`, `Teal`, `Scribble Purple`, `Chocolate Brown`, `Honey Burst`, `Florida Blue`, `Autumn Oak`, `Pelham Blue`, `Wild Strawberry`, `Yellow`, `Sepia`, `Macassar`, `Majestic Blue`, `Hope Pink`, `Prussian Blue`, `Mediterranean Blue`, `Eau de Nil`, `Evergreen`, `Desert Burst`, `Quartz Black`, `Midnight`, `Imperial Blue`, `Asa Blue`, `Claret`, `Aqua Blue`], `80ml bottled ink · 공식 페이지 일부`, 80, `https://www.diamineinks.co.uk/collections/diamine-80ml-fountain-pen-ink`, `https://www.diamineinks.co.uk/collections/diamine-80ml-fountain-pen-ink`, `UK`),
+      ...listed(`Teranishi Guitar`, [`Night Time Soda`, `Traveling Sepia`, `Brilliant Mint`, `Orchestra Tangerine`, `Classy Burgundy`, `Smoky Navy`, `Emotional Olive`, `Innocent Mauve`, `Antique Black`, `Opera Rose`, `Lady Emerald`, `Nostalgic Honey`, `Modern Red`, `Melancholic Blue`, `Gentle Green`, `Salon de Violet`], `Taisho Roman Haikara Ink`, 40, `https://www.guitar-mg.co.jp/special-contents/haikaraink`, `https://www.guitar-mg.co.jp/special-contents/haikaraink`, `JP`),
+      ...listed(`Graf von Faber-Castell`, [`Carbon Black`, `Stone Grey`, `Midnight Blue`, `Royal Blue`, `Lapis Lazuli`, `Cobalt Blue`, `Gulf Blue`, `Turquoise`, `Deep Sea Green`, `Viper Green`, `Moss Green`, `Olive Green`, `Hazelnut Brown`, `Cognac Brown`, `Burned Orange`, `India Red`, `Garnet Red`, `Yozakura (Cherry Blossom Pink)`, `Electric Pink`, `Violet Blue`], `Ink`, 75, `https://shop.graf-von-faber-castell.us/collections/ink`, `https://www.faber-castell.com/graf-von-faber-castell/series/ink`, `US`),
+      ...listed(`J. Herbin`, [`1670 Anniversary · Bleu Ocean`, `1670 Anniversary · Rouge Hematite`, `1670 Anniversary · Stormy Grey`, `1670 Anniversary · Caroube de Chypre`, `1670 Anniversary · Emerald of Chivor`, `1670 Anniversary · Ocean Blue`, `1798 · Amethyste de l'Oural`, `1798 · Cornaline d'Egypte`, `1798 · Kyanite du Nepal`, `1798 · Violette Pensee`], `1670 / 1798`, 50, `https://www.papertree.jp/collections/herbin`, `https://www.jacquesherbin.com/`, `FR`),
+      ...listed(`BUNGUBOX`, [`Mandarin Orange`, `Lingering Cherry Blossoms`, `Into the Blue`, `Shuto-Bancha`, `Eternal Sunset`], `BUNGUBOX Original`, 30, `https://bungubox.shop/pages/online_store`, `https://bungubox.shop/`, `JP`),
+      ...listed(`Tono & Lims`, [`Winter Sunrise`, `Melancholy Warmth`, `Cold Beauty`, `Oort Swirl`, `Neptune's Rings`, `13 Cream Soda`, `Deep Field · product line`], `Tono & Lims`, 30, `https://tonoandlims.net/`, `https://tonolims.com/`, `KR/JP`),
     ];
-  return entries;
+  return [...entries, ...surveyed];
 })();
 function q({ value: e, onChange: t, options: n, name: r, id: i }) {
   let a = n.map((e) => (Array.isArray(e) ? e : [e, e])),
@@ -6378,7 +6397,7 @@ function Tr({ kind: e, onClose: t, prefill: n }) {
     [colorMessage, setColorMessage] = R(null),
     [pendingColorAdd, setPendingColorAdd] = R(null),
     [catalogPrefill, setCatalogPrefill] = R(null),
-    [catalogMode, setCatalogMode] = R(`verified`),
+    [catalogMode, setCatalogMode] = R(`brands`),
     [catalogBrand, setCatalogBrand] = R(``),
     g = (e) => (t) => h({ ...m, [e]: t }),
     _ = a ? r.state.pens : r.state.inks,
@@ -6399,7 +6418,7 @@ function Tr({ kind: e, onClose: t, prefill: n }) {
                   && !AdditionalInkCatalog.some((current) =>
                     V(current.brand) === V(entry.brand) && V(current.name) === V(entry.name))),
               ];
-        return candidates.filter((entry) => (!catalogBrand || entry.brand === catalogBrand) && Et(o, [entry.brand, entry.name, entry.ko])).slice(0, 30);
+        return candidates.filter((entry) => (!catalogBrand || entry.brand === catalogBrand) && Et(o, [entry.brand, entry.name, entry.ko])).slice(0, catalogBrand ? 300 : 30);
       },
       [o, a, catalogMode, catalogBrand],
     ),
@@ -6548,7 +6567,7 @@ function Tr({ kind: e, onClose: t, prefill: n }) {
                   onChange: (event) => setCatalogMode(event.target.value),
                   children: [
                     H(`option`, { value: `verified`, children: `한국 판매처 상품 목록 확인 · Pilot 24종 + Sailor 20종` }),
-                    H(`option`, { value: `brands`, children: `추가 브랜드 목록 · Esterbrook, Pelikan, Parker` }),
+                    H(`option`, { value: `brands`, children: `조사한 브랜드 카탈로그 · Wearingeul, Montblanc, Kobe 등` }),
                     H(`option`, { value: `all`, children: `전체 입력 후보 · 판매 상태 미확인 포함` }),
                   ],
                 }),
@@ -6591,7 +6610,7 @@ function Tr({ kind: e, onClose: t, prefill: n }) {
               children: catalogMode === `verified`
                 ? `상품 페이지에서 색상 선택 상품이 확인된 목록이에요. 재고와 판매 지역은 판매처에서 확인해 주세요. 제품을 고르면 내 목록에 추가하기 전에 정보를 고칠 수 있어요.`
                 : catalogMode === `brands`
-                  ? `제조사·판매처 카탈로그에서 확인한 제품 후보예요. 한국 판매 및 색상별 재고는 확인하지 못했어요. 용량도 확인한 뒤 내 목록에 추가해 주세요.`
+                  ? `조사한 브랜드의 제품 후보예요. 브랜드를 선택하면 해당 브랜드 후보를 모두 볼 수 있어요. 항목마다 제조사·판매처 출처를 확인하고, 한정·품절·지역별 차이가 있을 수 있으니 구매 가능 상태와 용량은 링크에서 확인해 주세요.`
                   : `이 목록에는 판매 여부를 확인하지 못한 기존 입력 후보도 포함돼요. 제품을 고르면 내 목록에 추가하기 전에 정보를 고칠 수 있어요.`,
             }),
             H(`ul`, {
