@@ -6039,6 +6039,7 @@ function Cr({
   onPhoto: r,
   onPut: i,
   onFacts: a,
+  recommendation: recommendationContext,
 }) {
   let { c: o, go: s } = U(),
     c = o.state,
@@ -6091,6 +6092,38 @@ function Cr({
           class: `dt-swatch`,
           style: { background: J(e) },
           "aria-hidden": `true`,
+        }),
+        recommendationContext && H(`section`, {
+          class: `card pad stack`,
+          "aria-label": `추천 점수 근거`,
+          children: [
+            H(`h3`, { children: `추천 점수 근거` }),
+            H(`p`, {
+              children: [
+                `기준 만년필: `,
+                H(`b`, { children: `${recommendationContext.pen.brand} ${recommendationContext.pen.name}` }),
+                ` · 적합도 `,
+                H(`b`, { children: `${recommendationContext.match.score}점` }),
+                ` · 근거 수준 ${recommendationContext.match.certainty >= 65 ? `높음` : recommendationContext.match.certainty >= 35 ? `보통` : `낮음`} (${recommendationContext.match.certainty})`,
+              ],
+            }),
+            H(`p`, {
+              class: `muted`,
+              children: `적합도는 이 만년필과 잉크 조합의 추천 점수이고, 근거 수준은 직접 시필·확인 자료의 충분함을 나타내요. 아래 항목은 점수에 반영된 근거와 아직 확인되지 않은 정보예요.`,
+            }),
+            recommendationContext.match.why?.length > 0 && H(`div`, {
+              children: [
+                H(`b`, { children: `점수에 반영한 근거` }),
+                H(`ul`, { class: `why`, children: recommendationContext.match.why.map((reason) => H(`li`, { children: reason }, reason)) }),
+              ],
+            }),
+            recommendationContext.match.warnings?.length > 0 && H(`div`, {
+              children: [
+                H(`b`, { children: `미확인·주의 정보` }),
+                H(`ul`, { class: `warn`, children: recommendationContext.match.warnings.map((warning) => H(`li`, { children: warning }, warning)) }),
+              ],
+            }),
+          ],
         }),
         H(`section`, {
           class: `card pad stack`,
@@ -9946,7 +9979,7 @@ function mi() {
     D = (e) => (b && E && e.ink.id !== E.ink.id ? e.score - E.score : null),
     O = b ? `inks` : `pens`,
     k = (e) => r[O].find((t) => t.id === e),
-    A = (e, t) => _({ t: e, id: t }),
+    A = (e, t, match = null) => _({ t: e, id: t, ...(match && b ? { recommendation: { match, pen: S } } : {}) }),
     ee = async (n) => {
       (await e.swapInk(n.pen.id, n.ink.id),
         t(`${n.pen.name}에 ${n.ink.name} 넣었어요`));
@@ -10100,7 +10133,7 @@ function mi() {
               "data-rank": n + 1,
               "data-item": e.item.id,
               onClick: (t) => {
-                t.target.closest(`button,a`) || A(`detail`, e.item.id);
+                t.target.closest(`button,a`) || A(`detail`, e.item.id, e);
               },
               children: [
                 b
@@ -10136,7 +10169,7 @@ function mi() {
                           class: `name-btn`,
                           type: `button`,
                           "data-detail": e.item.id,
-                          onClick: () => A(`detail`, e.item.id),
+                          onClick: () => A(`detail`, e.item.id, e),
                           children: [
                             H(`b`, { children: e.item.brand }),
                             ` `,
@@ -10217,12 +10250,12 @@ function mi() {
                       ],
                     }),
                     H(pi, { r: e, base: S, isPen: b, curInk: T }),
-                    (e.why || []).length > 0 &&
+                    !b && (e.why || []).length > 0 &&
                       H(`ul`, {
                         class: `why`,
                         children: e.why.map((e) => H(`li`, { children: e }, e)),
                       }),
-                    (e.warnings || []).length > 0 &&
+                    !b && (e.warnings || []).length > 0 &&
                       H(`ul`, {
                         class: `warn`,
                         children: e.warnings.map((e) =>
@@ -10259,6 +10292,7 @@ function mi() {
         (b
           ? H(Cr, {
               ink: k(g.id),
+              recommendation: g.recommendation,
               onClose: () => _(null),
               onEdit: () => A(`edit`, g.id),
               onPhoto: () => A(`photo`, g.id),
@@ -15206,7 +15240,7 @@ var ro = {
     [`inks`, `잉크`],
     [`pens`, `만년필`],
   ],
-  oo = `1.121.2`;
+  oo = `1.122.0`;
 function so({ message: e }) {
   return H(`main`, {
     class: `fatal`,
