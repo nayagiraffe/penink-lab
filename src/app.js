@@ -5808,6 +5808,12 @@ function xr({ pen: e, onClose: t, onSwap: n, onEdit: r, onPhoto: i }) {
     await a.patch(`pens`, e.id, { lastCleanedDate: today, cleaningLog: log.at(-1) === today ? log : [...log, today] });
     notify(`세척일을 ${today}로 기록했어요`);
   }
+  async function deletePen() {
+    if (!window.confirm(`${e.brand} ${e.name} 을(를) 목록에서 삭제할까요? (기존 기록은 남아요)`)) return;
+    await a.remove(`pens`, e.id);
+    notify(`삭제했어요`);
+    t();
+  }
   return H(W, {
     title: `${e.brand} ${e.name}`,
     onClose: t,
@@ -5931,6 +5937,12 @@ function xr({ pen: e, onClose: t, onSwap: n, onEdit: r, onPhoto: i }) {
           class: `dt-actions`,
           children: [
             H(`button`, {
+              class: `btn outline`,
+              type: `button`,
+              onClick: () => o(`tests`, { penId: e.id }),
+              children: `시필 기록`,
+            }),
+            H(`button`, {
               class: `btn primary`,
               type: `button`,
               "data-swap": e.id,
@@ -5954,6 +5966,12 @@ function xr({ pen: e, onClose: t, onSwap: n, onEdit: r, onPhoto: i }) {
               type: `button`,
               onClick: i,
               children: `사진`,
+            }),
+            H(`button`, {
+              class: `btn danger`,
+              type: `button`,
+              onClick: deletePen,
+              children: `삭제`,
             }),
           ],
         }),
@@ -6041,7 +6059,7 @@ function Cr({
   onFacts: a,
   recommendation: recommendationContext,
 }) {
-  let { c: o, go: s } = U(),
+  let { c: o, go: s, toast: notify } = U(),
     c = o.state,
     l = gr(e.photo),
     colorNeighbors = Cn(e.colorHex)
@@ -6080,6 +6098,12 @@ function Cr({
             Math.min(100, Math.round((e.remainingMl / e.capacityMl) * 100)),
           )
         : null;
+  async function deleteInk() {
+    if (!window.confirm(`${e.brand} ${e.name} 을(를) 목록에서 삭제할까요? (기존 기록은 남아요)`)) return;
+    await o.remove(`inks`, e.id);
+    notify(`삭제했어요`);
+    t();
+  }
   return H(W, {
     title: `${e.brand} ${e.name}`,
     onClose: t,
@@ -6421,6 +6445,12 @@ function Cr({
               type: `button`,
               onClick: r,
               children: `사진`,
+            }),
+            H(`button`, {
+              class: `btn danger`,
+              type: `button`,
+              onClick: deleteInk,
+              children: `삭제`,
             }),
             a &&
               H(`button`, {
@@ -8402,7 +8432,7 @@ function Xr({ pen: e, onClose: t }) {
   });
 }
 function Zr() {
-  let { c: e, photos: t, toast: n, go: r, nav: i } = U(),
+  let { c: e, photos: t, nav: i } = U(),
     [a, o] = R(``),
     [s, c] = R(null),
     [l, u] = R((i && i.view) || `brand`);
@@ -8422,11 +8452,6 @@ function Zr() {
       [e.state.pens, a],
     ),
     p = B(() => d[l].group(f), [d, l, f]),
-    m = async (t) => {
-      window.confirm(
-        `${t.brand} ${t.name} 을(를) 목록에서 삭제할까요? (기존 기록은 남아요)`,
-      ) && (await e.remove(`pens`, t.id), n(`삭제했어요`));
-    },
     h = (t) => e.state.pens.find((e) => e.id === t);
   return H(`section`, {
     "aria-label": `만년필`,
@@ -8609,41 +8634,6 @@ function Zr() {
                                     class: `state-pill ` + i,
                                     children: Fn[i],
                                   }),
-                                }),
-                                H(`div`, {
-                                  class: `actions`,
-                                  children: [
-                                    H(`button`, {
-                                      class: `chip`,
-                                      type: `button`,
-                                      "data-pentest": n.id,
-                                      onClick: () =>
-                                        r(`tests`, { penId: n.id }),
-                                      children: `시필`,
-                                    }),
-                                    H(`button`, {
-                                      class: `chip`,
-                                      type: `button`,
-                                      "data-editpen": n.id,
-                                      onClick: () => c({ t: `edit`, id: n.id }),
-                                      children: `수정`,
-                                    }),
-                                    H(`button`, {
-                                      class: `chip`,
-                                      type: `button`,
-                                      "data-penphoto": n.id,
-                                      onClick: () =>
-                                        c({ t: `photo`, id: n.id }),
-                                      children: `사진`,
-                                    }),
-                                    H(`button`, {
-                                      class: `chip danger`,
-                                      type: `button`,
-                                      "data-delpen": n.id,
-                                      onClick: () => m(n),
-                                      children: `삭제`,
-                                    }),
-                                  ],
                                 }),
                               ],
                             }),
@@ -10450,14 +10440,14 @@ function hi() {
         `filled`,
         () => t(`pens`, { view: `state`, group: `현재 잉입` }),
       ],
-      [s(a), `현재 확인된 잉크 · 종`, `activeinks`, () => t(`current`)],
+      [s(a), `현재 확인된 잉크 · 종`, `activeinks`, () => t(`inks`)],
       [
         o.length,
         `기존 잉입 기록 · 현재 미확인 자루`,
         `unc`,
         () => t(`pens`, { view: `state`, group: `현재 미확인` }),
       ],
-      [s(o), `기존 잉입 기록의 잉크 · 종`, `uncinks`, () => t(`current`)],
+      [s(o), `기존 잉입 기록의 잉크 · 종`, `uncinks`, () => t(`inks`)],
     ];
   return H(`div`, {
     class: `hero`,
@@ -12060,7 +12050,7 @@ var xi = (e) => {
         : ``;
 };
 function Si() {
-  let { c: e, photos: t, toast: n, go: r } = U(),
+  let { c: e, photos: t, toast: n } = U(),
     [i, a] = R(``),
     [o, s] = R(null),
     [c, l] = R(`brand`),
@@ -12099,11 +12089,6 @@ function Si() {
       : [],
     f = B(() => u[c].group(d), [u, c, d]),
     p = (t) => e.state.pens.filter((e) => e.status === `현재 잉입` && Rn(e, t)),
-    m = async (t) => {
-      window.confirm(
-        `${t.brand} ${t.name} 을(를) 목록에서 삭제할까요? (기존 기록은 남아요)`,
-      ) && (await e.remove(`inks`, t.id), n(`삭제했어요`));
-    },
     h = (t) => e.state.inks.find((e) => e.id === t);
   return H(`section`, {
     "aria-label": `잉크`,
@@ -12324,43 +12309,8 @@ function Si() {
                                   H(`div`, {
                                     class: `meta using`,
                                     "data-using": !0,
-                                    children: i.map((e) => e.name).join(`, `),
+                                    children: [`현재 잉입 · `, i.map((e) => Z(e)).join(`, `)],
                                   }),
-                                H(`div`, {
-                                  class: `actions`,
-                                  children: [
-                                    H(`button`, {
-                                      class: `chip`,
-                                      type: `button`,
-                                      "data-inktest": e.id,
-                                      onClick: () =>
-                                        r(`tests`, { inkId: e.id }),
-                                      children: `시필`,
-                                    }),
-                                    H(`button`, {
-                                      class: `chip`,
-                                      type: `button`,
-                                      "data-editink": e.id,
-                                      onClick: () => s({ t: `edit`, id: e.id }),
-                                      children: `수정`,
-                                    }),
-                                    H(`button`, {
-                                      class: `chip`,
-                                      type: `button`,
-                                      "data-inkphoto": e.id,
-                                      onClick: () =>
-                                        s({ t: `photo`, id: e.id }),
-                                      children: `사진`,
-                                    }),
-                                    H(`button`, {
-                                      class: `chip danger`,
-                                      type: `button`,
-                                      "data-delink": e.id,
-                                      onClick: () => m(e),
-                                      children: `삭제`,
-                                    }),
-                                  ],
-                                }),
                               ],
                             }),
                           ],
@@ -15317,7 +15267,7 @@ var ro = {
     data: { title: `백업·복원`, icon: H(Rt, {}), page: H(no, {}) },
   },
   io = [
-    [`추천`, [`reco`, `current`]],
+    [`추천`, [`reco`]],
     [`컬렉션`, [`inks`, `pens`]],
     [`기록`, [`history`, `tests`, `papers`]],
     [`관리`, [`data`]],
@@ -15328,7 +15278,7 @@ var ro = {
     [`inks`, `잉크`],
     [`pens`, `만년필`],
   ],
-  oo = `1.123.0`;
+  oo = `1.124.0`;
 function so({ message: e }) {
   return H(`main`, {
     class: `fatal`,
