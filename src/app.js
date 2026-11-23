@@ -9917,6 +9917,50 @@ function pi({ r: e, base: t, isPen: n, curInk: r }) {
         ],
       });
 }
+function recommendPaperFromTests(penId, inkId, tests, papers) {
+  let profiles = papers || [],
+    byId = new Map(profiles.map((paper) => [paper.id, paper])),
+    groups = new Map();
+  for (let test of tests || []) {
+    if (test.penId !== penId || test.inkId !== inkId || (test.evidence && test.evidence !== `hands-on`)) continue;
+    let profile = byId.get(test.paperId) || profiles.find((paper) => !test.paperId && test.paper && V(paper.name) === V(test.paper)),
+      name = profile?.name || String(test.paper || ``).trim();
+    if (!name) continue;
+    let key = profile?.id || V(name),
+      group = groups.get(key) || { name, id: profile?.id || ``, tests: 0, ratings: [] };
+    group.tests++;
+    let rating = Number(test.rating);
+    if (String(test.rating ?? ``).trim() !== `` && Number.isFinite(rating) && rating >= 1 && rating <= 5) group.ratings.push(rating);
+    groups.set(key, group);
+  }
+  let rated = [...groups.values()]
+    .filter((group) => group.ratings.length)
+    .map((group) => ({ ...group, average: group.ratings.reduce((sum, rating) => sum + rating, 0) / group.ratings.length }))
+    .sort((first, second) => second.average - first.average || second.ratings.length - first.ratings.length || second.tests - first.tests || Dt.compare(first.name, second.name));
+  if (!rated.length) {
+    let records = [...groups.values()].reduce((sum, group) => sum + group.tests, 0);
+    return { status: records ? `unrated` : `none`, tests: records };
+  }
+  let best = rated[0];
+  return { ...best, status: best.average >= 4 ? `recommended` : `caution` };
+}
+function inkRecommendationTraits(ink, match) {
+  let traits = [],
+    hue = String(ink.hue || ``).trim(),
+    family = String(ink.family || ``).trim(),
+    effect = String(ink.effect || ``).trim(),
+    flow = String(ink.flow || ``).trim(),
+    why = match?.why || [],
+    warnings = match?.warnings || [];
+  if (hue && !/미확인|미분류/.test(hue)) traits.push(`색 ${hue}`);
+  else if (family && !/미확인|미분류/.test(family)) traits.push(`색 계열 ${family}`);
+  if (effect && !/^(standard|미확인|기본)$/i.test(effect)) traits.push(effect);
+  if (flow && !/^(미확인|unknown|없음)$/i.test(flow)) traits.push(`흐름 ${flow.slice(0, 28)}`);
+  if (why.some((item) => /농담\(shading\)|농담 관찰/.test(item))) traits.push(`농담 관찰`);
+  if (why.some((item) => /광택\(sheen\)|테 관찰/.test(item))) traits.push(`테 관찰`);
+  if (warnings.some((item) => /잉크 공급·흐름 데이터 미확인/.test(item)) && !traits.some((item) => item.startsWith(`흐름 `))) traits.push(`흐름 미확인`);
+  return [...new Set(traits)].slice(0, 4);
+}
 function mi() {
   let { c: e, toast: t, nav: n } = U(),
     r = e.state,
@@ -10125,8 +10169,12 @@ function mi() {
         }),
       H(`ol`, {
         class: `reco`,
-        children: w.slice(0, u).map((e, n) =>
-          H(
+        children: w.slice(0, u).map((e, n) => {
+          let paperSuggestion = b ? recommendPaperFromTests(S.id, e.ink.id, r.tests, r.papers) : null,
+            inkTraits = b ? inkRecommendationTraits(e.ink, e) : [],
+            reasonPreview = (e.why || []).slice(0, 2),
+            warningPreview = (e.warnings || [])[0] || ``;
+          return H(
             `li`,
             {
               class: `card reco-row reco-click`,
@@ -10249,6 +10297,46 @@ function mi() {
                           }),
                       ],
                     }),
+                    b && H(`div`, {
+                      class: `reco-card-info`,
+                      children: [
+                        H(`div`, {
+                          class: `reco-card-line`,
+                          children: [
+                            H(`b`, { children: `잉크 특성` }),
+                            inkTraits.length
+                              ? H(`div`, { class: `reco-ink-traits`, children: inkTraits.map((trait) => H(`span`, { class: `tag`, children: trait }, trait)) })
+                              : H(`span`, { class: `muted`, children: `기록된 특성 없음` }),
+                          ],
+                        }),
+                        H(`div`, {
+                          class: `reco-card-line`,
+                          children: [
+                            H(`b`, { children: `추천 근거` }),
+                            H(`span`, { children: reasonPreview.length ? reasonPreview.join(` · `) : `확인된 근거가 부족해요.` }),
+                          ],
+                        }),
+                        warningPreview && H(`div`, {
+                          class: `reco-card-line reco-card-warning`,
+                          children: [H(`b`, { children: `주의` }), H(`span`, { children: warningPreview })],
+                        }),
+                        H(`div`, {
+                          class: `reco-card-line`,
+                          children: [
+                            H(`b`, { children: `추천 종이` }),
+                            H(`span`, {
+                              children: paperSuggestion.status === `recommended`
+                                ? `${paperSuggestion.name} · 내 평점 ${paperSuggestion.average.toFixed(1)}/5 (${paperSuggestion.ratings.length}건${paperSuggestion.ratings.length < 2 ? ` · 잠정` : ``})`
+                                : paperSuggestion.status === `caution`
+                                  ? `내 최고 평가 ${paperSuggestion.name} · ${paperSuggestion.average.toFixed(1)}/5 (${paperSuggestion.ratings.length}건) · 추천 보류`
+                                  : paperSuggestion.status === `unrated`
+                                    ? `같은 조합 시필 ${paperSuggestion.tests}건 · 평점 미기록`
+                                    : `같은 만년필·잉크 조합의 종이 평가 기록 없음`,
+                            }),
+                          ],
+                        }),
+                      ],
+                    }),
                     H(pi, { r: e, base: S, isPen: b, curInk: T }),
                     !b && (e.why || []).length > 0 &&
                       H(`ul`, {
@@ -10276,8 +10364,8 @@ function mi() {
               ],
             },
             e.item.id,
-          ),
-        ),
+          );
+        }),
       }),
       w.length > u &&
         H(`button`, {
@@ -15240,7 +15328,7 @@ var ro = {
     [`inks`, `잉크`],
     [`pens`, `만년필`],
   ],
-  oo = `1.122.0`;
+  oo = `1.123.0`;
 function so({ message: e }) {
   return H(`main`, {
     class: `fatal`,
