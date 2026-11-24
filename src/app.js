@@ -12364,13 +12364,15 @@ function Si() {
                   class: `plain-list`,
                   children: activeColorPairs.map((pair) =>
                     H(`li`, {
-                      class: `list-row`,
+                      class: `list-row color-pair-row`,
+                      "aria-label": `${pair.first.brand} ${pair.first.name}와 ${pair.second.brand} ${pair.second.name} 상세 보기`,
+                      onClick: () => s({ t: `detail`, id: pair.first.id }),
                       children: [
                         H(`span`, { class: `dot`, style: { background: pair.first.colorHex }, "aria-hidden": `true` }),
-                        H(`button`, { class: `link-btn`, type: `button`, onClick: () => s({ t: `detail`, id: pair.first.id }), children: `${pair.first.brand} ${pair.first.name}` }),
+                        H(`button`, { class: `link-btn`, type: `button`, title: `잉크 상세 보기`, onClick: (event) => { event.stopPropagation(); s({ t: `detail`, id: pair.first.id }); }, children: `${pair.first.brand} ${pair.first.name}` }),
                         H(`span`, { class: `muted`, children: ` ↔ ` }),
                         H(`span`, { class: `dot`, style: { background: pair.second.colorHex }, "aria-hidden": `true` }),
-                        H(`button`, { class: `link-btn`, type: `button`, onClick: () => s({ t: `detail`, id: pair.second.id }), children: `${pair.second.brand} ${pair.second.name}` }),
+                        H(`button`, { class: `link-btn`, type: `button`, title: `잉크 상세 보기`, onClick: (event) => { event.stopPropagation(); s({ t: `detail`, id: pair.second.id }); }, children: `${pair.second.brand} ${pair.second.name}` }),
                         H(`small`, { class: `muted`, children: ` · ΔE00 ${pair.delta.toFixed(1)}` }),
                       ],
                     }, `${pair.first.id}-${pair.second.id}`),
@@ -15440,7 +15442,7 @@ var ro = {
     [`inks`, `잉크`],
     [`pens`, `만년필`],
   ],
-  oo = `1.129.0`;
+  oo = `1.130.0`;
 function so({ message: e }) {
   return H(`main`, {
     class: `fatal`,

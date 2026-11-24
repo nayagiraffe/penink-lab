@@ -2558,6 +2558,18 @@ details summary {
   flex-wrap: wrap;
   min-width: 0;
 }
+.color-pair-review .color-pair-row {
+  border-radius: 8px;
+  cursor: pointer;
+  padding: 6px 4px;
+}
+.color-pair-review .color-pair-row:hover {
+  background: var(--sunken);
+}
+.color-pair-review .color-pair-row:focus-within {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
 .color-pair-review .link-btn {
   min-width: 0;
   overflow-wrap: anywhere;
