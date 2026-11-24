@@ -6112,6 +6112,7 @@ function Cr({
   onPhoto: r,
   onPut: i,
   onFacts: a,
+  onOpenInk: openInk,
   recommendation: recommendationContext,
 }) {
   let { c: o, go: s, toast: notify } = U(),
@@ -6228,7 +6229,7 @@ function Cr({
                           class: `ink-neighbor-link`,
                           type: `button`,
                           "aria-label": `${ink.brand} ${ink.name} 상세 보기, ΔE00 ${delta.toFixed(1)} · ${delta <= 2 ? `거의 중복` : `비슷한 색`}`,
-                          onClick: () => s({ t: `detail`, id: ink.id }),
+                          onClick: () => openInk?.(ink.id),
                           children: [
                             H(`span`, {
                               class: `dot`,
@@ -10480,6 +10481,7 @@ function mi() {
           ? H(Cr, {
               ink: k(g.id),
               recommendation: g.recommendation,
+              onOpenInk: (inkId) => A(`detail`, inkId),
               onClose: () => _(null),
               onEdit: () => A(`edit`, g.id),
               onPhoto: () => A(`photo`, g.id),
@@ -12502,6 +12504,7 @@ function Si() {
         h(o.id) &&
         H(Cr, {
           ink: h(o.id),
+          onOpenInk: (inkId) => s({ t: `detail`, id: inkId }),
           onClose: () => s(null),
           onEdit: () => s({ t: `edit`, id: o.id }),
           onPhoto: () => s({ t: `photo`, id: o.id }),
@@ -15448,7 +15451,7 @@ var ro = {
     [`inks`, `잉크`],
     [`pens`, `만년필`],
   ],
-  oo = `1.131.0`;
+  oo = `1.132.0`;
 function so({ message: e }) {
   return H(`main`, {
     class: `fatal`,
