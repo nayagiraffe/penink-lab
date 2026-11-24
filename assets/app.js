@@ -15277,7 +15277,7 @@ var ro = {
     [`inks`, `잉크`],
     [`pens`, `만년필`],
   ],
-  oo = `1.125.0`;
+  oo = `1.126.0`;
 function so({ message: e }) {
   return H(`main`, {
     class: `fatal`,
@@ -15310,7 +15310,7 @@ function co() {
 function DriveAutoSync({ c, photos, auth, onStatus }) {
   let running = ft(!1), baseline = ft(``), timer = ft(null);
   z(() => {
-    let active = !0, connected = !1;
+    let active = !0, connected = !1, loginStarted = !1;
     baseline.current = Ua(F.map((kind) => c.state[kind]));
     async function sync(reason) {
       if (!active || !connected || running.current) return;
@@ -15331,7 +15331,16 @@ function DriveAutoSync({ c, photos, auth, onStatus }) {
     async function checkConnection(syncNow = !1) {
       connected = !!(await c.store.getMeta(`driveConnected`));
       if (connected && syncNow) sync(`foreground`);
-      else if (!connected) onStatus(``);
+      else if (!connected) {
+        onStatus(``);
+        if (loginStarted) return;
+        loginStarted = !0;
+        let asked = await c.store.getMeta(`driveChoiceAsked`);
+        if (!asked && active) {
+          await c.store.setMeta(`driveChoiceAsked`, !0);
+          auth.connect();
+        }
+      }
     }
     let unsubscribe = c.subscribe(() => {
       if (!connected || running.current) return;
