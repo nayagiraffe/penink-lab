@@ -5050,11 +5050,18 @@ async function autoInkPhotoColor(photo, ink) {
   let colorLabels = `${ink?.hue || ``} ${ink?.family || ``}`,
     target = J({ hue: ink?.hue, family: colorLabels }),
     hasTarget = !!(xn[ink?.hue] || Sn.some(([pattern]) => pattern.test(colorLabels))),
+    [targetR, targetG, targetB] = On(target),
+    targetChroma = (Math.max(targetR, targetG, targetB) - Math.min(targetR, targetG, targetB)) / Math.max(targetR, targetG, targetB, 1),
     candidates = [];
   for (let row = 0; row < 3; row++)
     for (let col = 0; col < 3; col++) {
       let result = await Mn(photo, { col, row });
-      if (!result || result.samples < 12) continue;
+      if (!result || result.samples < 80 || result.dominantShare < 0.1) continue;
+      let [red, green, blue] = On(result.hex),
+        maxChannel = Math.max(red, green, blue),
+        minChannel = Math.min(red, green, blue),
+        chroma = (maxChannel - minChannel) / Math.max(maxChannel, 1);
+      if (hasTarget && targetChroma > 0.2 && chroma < 0.16) continue;
       let delta = hasTarget ? ColorDeltaE00(result.hex, target) : null;
       candidates.push({ ...result, col, row, delta });
     }
@@ -15433,7 +15440,7 @@ var ro = {
     [`inks`, `잉크`],
     [`pens`, `만년필`],
   ],
-  oo = `1.128.0`;
+  oo = `1.129.0`;
 function so({ message: e }) {
   return H(`main`, {
     class: `fatal`,
