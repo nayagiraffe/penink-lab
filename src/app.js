@@ -5046,6 +5046,26 @@ async function Mn(e, crop = { col: 1, row: 1 }) {
     return null;
   }
 }
+async function autoInkPhotoColor(photo, ink) {
+  let colorLabels = `${ink?.hue || ``} ${ink?.family || ``}`,
+    target = J({ hue: ink?.hue, family: colorLabels }),
+    hasTarget = !!(xn[ink?.hue] || Sn.some(([pattern]) => pattern.test(colorLabels))),
+    candidates = [];
+  for (let row = 0; row < 3; row++)
+    for (let col = 0; col < 3; col++) {
+      let result = await Mn(photo, { col, row });
+      if (!result || result.samples < 12) continue;
+      let delta = hasTarget ? ColorDeltaE00(result.hex, target) : null;
+      candidates.push({ ...result, col, row, delta });
+    }
+  candidates.sort((first, second) => {
+    if (hasTarget && first.delta !== second.delta) return first.delta - second.delta;
+    return second.dominantShare - first.dominantShare || second.samples - first.samples;
+  });
+  let best = candidates[0];
+  if (!best || (hasTarget && best.delta > 38)) return null;
+  return { ...best, candidateCount: candidates.length, targetHex: hasTarget ? target : `` };
+}
 var Nn = new Intl.Collator(`ko`, { numeric: !0, sensitivity: `base` }),
   Y = (e) => !!(e.inkName && e.inkName !== `—`),
   Pn = (e) =>
@@ -5230,9 +5250,23 @@ function qn({ kind: e, rec: t, onClose: n }) {
   }
   async function h(n) {
     if (e !== `inks` || t.colorSource === `manual`) return {};
-    let r = await Mn(n);
+    let r = await autoInkPhotoColor(n, t);
     return r
-      ? { colorHex: r, colorSource: `auto`, ...(t.hue ? {} : { hue: An(r) }) }
+      ? {
+          colorHex: r.hex,
+          colorSource: `auto`,
+          colorAnalysis: {
+            method: `photo-grid-hue-v2`,
+            col: r.col,
+            row: r.row,
+            samples: r.samples,
+            dominantShare: r.dominantShare,
+            candidateCount: r.candidateCount,
+            targetDeltaE: r.delta,
+            analyzedAt: new Date().toISOString(),
+          },
+          ...(t.hue ? {} : { hue: An(r.hex) }),
+        }
       : {};
   }
   async function g(a) {
@@ -6500,7 +6534,7 @@ var wr = {
   notes: ``,
 };
 function Tr({ kind: e, onClose: t, prefill: n }) {
-  let { c: r, toast: i } = U(),
+  let { c: r, toast: i, photos: photoStore } = U(),
     a = e === `pens`,
     [o, s] = R(``),
     [c, l] = R(!!n),
@@ -6555,11 +6589,26 @@ function Tr({ kind: e, onClose: t, prefill: n }) {
       photoDraft?.url ? () => URL.revokeObjectURL(photoDraft.url) : void 0,
     [photoDraft?.url],
   );
-  function chooseColorPhoto(file) {
+  async function chooseColorPhoto(file) {
     if (!file) return;
-    setPhotoDraft({ blob: file, url: URL.createObjectURL(file), col: 1, row: 1 });
+    let draft = { blob: file, url: URL.createObjectURL(file), col: 1, row: 1 };
+    setPhotoDraft(draft);
     setColorMessage(null);
     setPendingColorAdd(null);
+    if (!a) {
+      setExtractingColor(!0);
+      try {
+        let result = await autoInkPhotoColor(file, m);
+        if (result) {
+          let nextDraft = { ...draft, col: result.col, row: result.row };
+          setPhotoDraft(nextDraft);
+          h((current) => ({ ...current, colorHex: result.hex, colorSource: `auto`, colorAnalysis: { method: `photo-grid-hue-v2`, col: result.col, row: result.row, samples: result.samples, dominantShare: result.dominantShare, candidateCount: result.candidateCount, targetDeltaE: result.delta, analyzedAt: new Date().toISOString() } }));
+          setColorMessage({ hex: result.hex, samples: result.samples, dominantShare: result.dominantShare, automatic: !0 });
+        } else setColorMessage({ none: !0 });
+      } finally {
+        setExtractingColor(!1);
+      }
+    }
   }
   async function extractAddColor() {
     if (!photoDraft) return;
@@ -6570,7 +6619,7 @@ function Tr({ kind: e, onClose: t, prefill: n }) {
         setColorMessage({ none: !0 });
         return;
       }
-      (h((current) => ({ ...current, colorHex: result.hex, colorSource: `auto`, colorAnalysis: { method: `photo-region-dominant-v1`, col: photoDraft.col, row: photoDraft.row, samples: result.samples, dominantShare: result.dominantShare, analyzedAt: new Date().toISOString() } })),
+      (h((current) => ({ ...current, colorHex: result.hex, colorSource: `auto`, colorAnalysis: { method: `photo-region-dominant-v2`, col: photoDraft.col, row: photoDraft.row, samples: result.samples, dominantShare: result.dominantShare, analyzedAt: new Date().toISOString() } })),
         setColorMessage({ hex: result.hex, samples: result.samples, dominantShare: result.dominantShare }));
     } finally {
       setExtractingColor(!1);
@@ -6589,6 +6638,7 @@ function Tr({ kind: e, onClose: t, prefill: n }) {
         return;
       }
     }
+    if (!a && photoDraft?.blob) n = { ...n, photo: await photoStore.add(photoDraft.blob) };
     (setPendingColorAdd(null), await r.add(e, n), i(`${n.brand} ${n.name} 추가했어요`), t());
   }
   let S = (e, t, n, r = ``) => ({
@@ -6912,7 +6962,7 @@ function Tr({ kind: e, onClose: t, prefill: n }) {
                       class: `field`,
                       children: [
                         H(`span`, { class: `flabel`, children: `색상 (선택)` }),
-                        H(`p`, { class: `hint`, children: `카드·색상 비교에 쓸 대표 색이에요. HEX를 직접 입력하거나 사진에서 추출할 수 있어요.` }),
+                        H(`p`, { class: `hint`, children: `사진을 올리면 앱이 3×3 영역을 살펴 잉크색 HEX를 자동으로 찾아요. 추출 영역과 HEX는 저장 전에 확인할 수 있어요.` }),
                         H(`div`, {
                           class: `color-row`,
                           children: [
@@ -6950,7 +7000,7 @@ function Tr({ kind: e, onClose: t, prefill: n }) {
                         photoDraft && H(`div`, {
                           class: `color-crop stack`,
                           children: [
-                            H(`p`, { class: `hint`, children: `3×3 영역 중 잉크가 넓고 고르게 보이는 칸을 고른 뒤 추출하세요.` }),
+                            H(`p`, { class: `hint`, children: `사진을 올리면 색을 자동으로 찾고, 아래에서 영역을 바꿔 다시 추출할 수도 있어요.` }),
                             H(`div`, { class: `color-crop-preview`, children: [
                               H(`img`, { src: photoDraft.url, alt: `색을 추출할 잉크 사진` }),
                               H(`div`, { class: `color-crop-grid`, "aria-hidden": `true`, children: Array.from({ length: 9 }, (_, index) => { let col = index % 3, row = Math.floor(index / 3), selected = photoDraft.col === col && photoDraft.row === row; return H(`div`, { class: `color-crop-cell` + (selected ? ` selected` : ``), children: selected ? `선택` : `` }, index); }) }),
@@ -7671,10 +7721,38 @@ function Gr({ ink: e, onClose: t }) {
       photoDraft?.url ? () => URL.revokeObjectURL(photoDraft.url) : void 0,
     [photoDraft?.url],
   );
-  function h(e) {
+  async function h(e) {
     if (!e) return;
-    setPhotoDraft({ blob: e, url: URL.createObjectURL(e), col: 1, row: 1 });
+    let draft = { blob: e, url: URL.createObjectURL(e), col: 1, row: 1 };
+    setPhotoDraft(draft);
     u(null);
+    f(!0);
+    try {
+      let result = await autoInkPhotoColor(e, a);
+      if (!result) {
+        u({ none: !0 });
+        return;
+      }
+      setPhotoDraft({ ...draft, col: result.col, row: result.row });
+      o((current) => ({
+        ...current,
+        colorHex: result.hex,
+        colorSource: `auto`,
+        colorAnalysis: {
+          method: `photo-grid-hue-v2`,
+          col: result.col,
+          row: result.row,
+          samples: result.samples,
+          dominantShare: result.dominantShare,
+          candidateCount: result.candidateCount,
+          targetDeltaE: result.delta,
+          analyzedAt: new Date().toISOString(),
+        },
+      }));
+      u({ hex: result.hex, name: An(result.hex), ...result, automatic: !0 });
+    } finally {
+      f(!1);
+    }
   }
   async function extractColor() {
     if (!photoDraft) return;
@@ -12073,7 +12151,48 @@ function Si() {
     [o, s] = R(null),
     [c, l] = R(`brand`),
     [colorFilter, setColorFilter] = R(``),
+    [photoColorProgress, setPhotoColorProgress] = R(null),
     u = B(() => Gn(), []),
+    photoColorCandidates = e.state.inks.filter((ink) => ink.colorSource === `auto` && ink.colorHex && ink.photo),
+    reextractInkPhotoColors = async () => {
+      if (photoColorProgress || !photoColorCandidates.length) return;
+      let changed = 0,
+        unchanged = 0,
+        skipped = 0;
+      setPhotoColorProgress({ done: 0, total: photoColorCandidates.length });
+      for (let index = 0; index < photoColorCandidates.length; index++) {
+        let ink = photoColorCandidates[index];
+        try {
+          let blob = await t.fullBlob(ink.photo),
+            result = blob ? await autoInkPhotoColor(blob, ink) : null;
+          if (!result) skipped++;
+          else {
+            let same = ink.colorHex.toLowerCase() === result.hex.toLowerCase();
+            await e.editInk(ink.id, {
+              colorHex: result.hex,
+              colorSource: `auto`,
+              colorAnalysis: {
+                method: `photo-grid-hue-v2`,
+                col: result.col,
+                row: result.row,
+                samples: result.samples,
+                dominantShare: result.dominantShare,
+                candidateCount: result.candidateCount,
+                targetDeltaE: result.delta,
+                previousHex: ink.colorHex,
+                analyzedAt: new Date().toISOString(),
+              },
+            });
+            same ? unchanged++ : changed++;
+          }
+        } catch {
+          skipped++;
+        }
+        setPhotoColorProgress({ done: index + 1, total: photoColorCandidates.length });
+      }
+      setPhotoColorProgress(null);
+      n(`사진 색 재분석 완료 · ${changed}개 변경, ${unchanged}개 유지, ${skipped}개 사진 확인 필요`);
+    },
     nearColorReview = B(() => {
       let colored = e.state.inks.filter((ink) => usableInkColor(ink)),
         pairs = [],
@@ -12169,6 +12288,25 @@ function Si() {
           H(`p`, {
             class: `hint`,
             children: `ΔE00는 확인 가능한 HEX 색의 지각적 차이를 비교합니다. 2 이하는 거의 중복, 2 초과~10 이하는 유사색 후보예요. 사진에서 추출한 거의 검정인 무채색은 배경 오인 가능성이 있어 제외합니다.`,
+          }),
+          photoColorCandidates.length > 0 && H(`div`, {
+            class: `color-actions stack`,
+            children: [
+              H(`button`, {
+                class: `chip`,
+                type: `button`,
+                id: `reextractInkPhotoColors`,
+                disabled: !!photoColorProgress,
+                onClick: reextractInkPhotoColors,
+                children: photoColorProgress
+                  ? `잉크 사진 분석 중 · ${photoColorProgress.done}/${photoColorProgress.total}`
+                  : `잉크 사진에서 색 다시 찾기 · ${photoColorCandidates.length}개`,
+              }),
+              H(`p`, {
+                class: `hint`,
+                children: `사진이 연결된 자동 추출 색만 다시 계산해요. 직접 입력한 색은 바꾸지 않으며, 새 HEX와 이전 HEX를 함께 기록해요.`,
+              }),
+            ],
           }),
           H(`div`, {
             class: `sort-bar`,
@@ -15295,7 +15433,7 @@ var ro = {
     [`inks`, `잉크`],
     [`pens`, `만년필`],
   ],
-  oo = `1.127.0`;
+  oo = `1.128.0`;
 function so({ message: e }) {
   return H(`main`, {
     class: `fatal`,
