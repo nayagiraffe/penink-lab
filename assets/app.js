@@ -2468,6 +2468,7 @@ function jt(e, t = {}) {
       P && (C += Math.min(25, 8 + P * 4)),
       (C = Math.min(90, C)),
       {
+        rawScore: Math.min(95, Math.max(8, u)),
         score: Math.min(95, Math.max(8, Math.round(u))),
         certainty: C,
         why: s,
@@ -2676,7 +2677,8 @@ function jt(e, t = {}) {
           k[D] &&
           a.indexOf(`실제 사용 평가: 좋음`) < 0 &&
           ((i += 2), a.push(`이 만년필에서 좋았던 색 계열 (+2)`)),
-        (e.score = Math.min(95, Math.max(8, Math.round(e.score + i)))),
+        (e.rawScore = Math.min(95, Math.max(8, (Number.isFinite(e.rawScore) ? e.rawScore : e.score) + i))),
+        (e.score = Math.round(e.rawScore)),
         (e.diversityAdj = i),
         (e.untried = untried),
         (e.tryNextBonus = untried ? Math.min(8, 95 - e.score) : 0),
@@ -2694,7 +2696,9 @@ function jt(e, t = {}) {
         typeof w == `function` &&
         e.sort(function (e, t) {
           return (
-            t.score - e.score || w(e.item.id, e.pen.id) - w(t.item.id, t.pen.id)
+            t.score - e.score ||
+            t.rawScore - e.rawScore ||
+            w(e.item.id, e.pen.id) - w(t.item.id, t.pen.id)
           );
         });
       var r = 12,
@@ -2716,7 +2720,7 @@ function jt(e, t = {}) {
         }
       }),
         c.sort(function (e, t) {
-          return t.score - e.score || t.certainty - e.certainty;
+          return t.score - e.score || t.rawScore - e.rawScore || t.certainty - e.certainty;
         }));
       var l = s.concat(c);
       return (
@@ -2775,7 +2779,8 @@ function jt(e, t = {}) {
       if (!e || !t || !n || _(t).indexOf(n.id) < 0) return e;
       var r = v(t, n, e);
       return (
-        (e.score = Math.min(95, Math.max(8, Math.round(e.score + r.bonus)))),
+        (e.rawScore = Math.min(95, Math.max(8, (Number.isFinite(e.rawScore) ? e.rawScore : e.score) + r.bonus))),
+        (e.score = Math.round(e.rawScore)),
         (e.companion = !0),
         (e.companionFit = r),
         (e.why = e.why || []).unshift(
@@ -2832,6 +2837,7 @@ function jt(e, t = {}) {
       .sort(
         (e, n) =>
           n.score - e.score ||
+          n.rawScore - e.rawScore ||
           n.certainty - e.certainty ||
           w(e.item.id, t.id) - w(n.item.id, t.id),
       );
@@ -2843,6 +2849,7 @@ function jt(e, t = {}) {
             t.score +
               (t.ink.packageType === `bottle` ? 4 : 0) -
               (e.score + (e.ink.packageType === `bottle` ? 4 : 0)) ||
+            t.rawScore - e.rawScore ||
             t.certainty - e.certainty,
         ),
       i.recBrandCap(c, n),
@@ -10095,6 +10102,14 @@ function mi() {
           : [],
       [r.pens, r.inks, r.history, r.tests, r.papers, S && S.id, b, c, P],
     ),
+    selectedPaper = P ? r.papers.find((paper) => paper.id === P) : null,
+    paperEvidenceFound = selectedPaper
+      ? C.some((match) =>
+          (match.why || []).some((reason) =>
+            reason.startsWith(`${selectedPaper.name} 기준 시필`),
+          ),
+        )
+      : true,
     w = B(() => {
       if (m === `score`) return C;
       let e = (e) =>
@@ -10111,11 +10126,11 @@ function mi() {
         };
       return C.slice().sort(
         m === `rating`
-          ? (e, t) => n(t) - n(e) || t.score - e.score
+          ? (e, t) => n(t) - n(e) || t.score - e.score || t.rawScore - e.rawScore
           : m === `tryNext`
             ? (e, t) =>
-                t.tryNextScore - e.tryNextScore || t.score - e.score
-          : (e, n) => +!!t.get(e) - !!t.get(n) || n.score - e.score,
+                t.tryNextScore - e.tryNextScore || t.score - e.score || t.rawScore - e.rawScore
+          : (e, n) => +!!t.get(e) - !!t.get(n) || n.score - e.score || n.rawScore - e.rawScore,
       );
     }, [C, m, r.tests, S && S.id, b]),
     T = b && S ? zn(r.inks, S) : null,
@@ -10215,6 +10230,12 @@ function mi() {
         ],
       }),
       S && H(di, { base: S, isPen: b, onZoom: p }, S.id + i),
+      selectedPaper && !paperEvidenceFound &&
+        H(`p`, {
+          class: `hint`,
+          role: `status`,
+          children: `이 종이에 대한 직접 또는 비교 가능한 시필 기록이 없어 이번 추천 점수에는 종이 조건이 반영되지 않았어요. 이 종이로 시필 기록을 남기면 이후 추천에 반영돼요.`,
+        }),
       S &&
         C.length > 0 &&
         H(`h2`, { class: `sec`, children: b ? `추천 잉크` : `추천 만년필` }),
@@ -15451,7 +15472,7 @@ var ro = {
     [`inks`, `잉크`],
     [`pens`, `만년필`],
   ],
-  oo = `1.132.0`;
+  oo = `1.133.0`;
 function so({ message: e }) {
   return H(`main`, {
     class: `fatal`,
