@@ -1,9 +1,9 @@
 /* Pen & Ink Lab 서비스 워커. 사용자 데이터(IndexedDB)는 건드리지 않는다. */
-const CACHE = "pil2-v1.124.0-recovered-source";
+const CACHE = "pil2-v1.125.0-recovered-source";
 const ASSETS = [
   "./",
-  "./assets/app.css?v=1.124.0",
-  "./assets/app.js?v=1.124.0",
+  "./assets/app.css?v=1.125.0",
+  "./assets/app.js?v=1.125.0",
   "./icons/favicon-32.png",
   "./icons/favicon-64.png",
   "./icons/icon-180.png",
@@ -49,6 +49,8 @@ self.addEventListener("activate", (e) => {
 self.addEventListener("fetch", (e) => {
   const req = e.request;
   if (req.method !== "GET" || new URL(req.url).origin !== self.location.origin)
+    return;
+  if (new URL(req.url).pathname.startsWith(new URL(self.registration.scope).pathname + "api/"))
     return;
   e.respondWith(
     caches.match(req, { ignoreSearch: true }).then(

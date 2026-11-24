@@ -13833,71 +13833,56 @@ function Aa(e = globalThis.document) {
       }));
 }
 function ja({
-  clientId: e,
-  scope: t = Da,
   now: n = () => Date.now(),
-  load: r = Aa,
 } = {}) {
-  let i = ``,
-    a = 0,
-    o = !1,
-    s = null,
-    c = null,
-    l = (e) =>
-      Error(
-        e && e.type === `popup_closed`
-          ? `로그인 창이 닫혔어요.`
-          : e && e.type === `popup_failed_to_open`
-            ? `로그인 창을 열 수 없어요. 브라우저의 팝업 차단을 확인해 주세요.`
-            : `구글 로그인에 실패했어요.`,
-      );
+  let i = ``, a = 0, inflight = null;
+  async function post(path) {
+    let response;
+    try {
+      response = await fetch(`/api/google/${path}`, {
+        method: `POST`,
+        credentials: `same-origin`,
+        headers: { "Content-Type": `application/json` },
+        body: `{}`,
+        cache: `no-store`,
+      });
+    } catch {
+      throw Error(`Google Drive 연결 서버에 접속할 수 없어요.`);
+    }
+    let body = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      if (path === `access-token` && response.status === 401)
+        window.dispatchEvent(new CustomEvent(`pil-drive-session-expired`));
+      throw Error(body.error || `Google Drive 연결을 확인하지 못했어요.`);
+    }
+    return body;
+  }
   return {
-    preload: () => r().catch(() => {}),
+    preload: () => {},
     hasToken: () => !!i && n() < a - 6e4,
-    ensure() {
-      return i && n() < a - 6e4
-        ? Promise.resolve(i)
-        : r().then(
-            () =>
-              new Promise((r, u) => {
-                ((c = { res: r, rej: u }),
-                  (s ||= globalThis.google.accounts.oauth2.initTokenClient({
-                    client_id: e,
-                    scope: t,
-                    callback: (e) => {
-                      let t = c;
-                      ((c = null),
-                        t &&
-                          (e.error || !e.access_token
-                            ? t.rej(
-                                Error(
-                                  e.error === `access_denied`
-                                    ? `권한을 허용하지 않아 연결하지 못했어요.`
-                                    : `구글 로그인에 실패했어요.`,
-                                ),
-                              )
-                            : ((i = e.access_token),
-                              (a = n() + (Number(e.expires_in) || 3600) * 1e3),
-                              (o = !0),
-                              t.res(i))));
-                    },
-                    error_callback: (e) => {
-                      let t = c;
-                      ((c = null), t && t.rej(l(e)));
-                    },
-                  })),
-                  s.requestAccessToken({ prompt: o ? `` : `consent` }));
-              }),
-          );
+    async ensure() {
+      if (i && n() < a - 6e4) return i;
+      if (inflight) return inflight;
+      inflight = post(`access-token`)
+        .then(({ access_token, expires_in }) => {
+          if (!access_token) throw Error(`Google Drive 접근 권한을 갱신하지 못했어요.`);
+          i = access_token;
+          a = n() + (Number(expires_in) || 3600) * 1e3;
+          return i;
+        })
+        .finally(() => { inflight = null; });
+      return inflight;
     },
-    revoke() {
-      let e = i;
-      ((i = ``), (a = 0), (o = !1));
-      try {
-        e &&
-          globalThis.google &&
-          globalThis.google.accounts.oauth2.revoke(e, () => {});
-      } catch {}
+    connect() {
+      location.assign(`/api/google/start`);
+    },
+    async sessionStatus() {
+      return post(`status`);
+    },
+    async revoke() {
+      i = ``;
+      a = 0;
+      await post(`disconnect`);
     },
   };
 }
@@ -14166,12 +14151,20 @@ function Za({ clientId: e = wa, tokenManager: t }) {
       p();
       let syncDone = () => p();
       window.addEventListener(`pil-drive-sync-complete`, syncDone);
-      return () => window.removeEventListener(`pil-drive-sync-complete`, syncDone);
+      window.addEventListener(`pil-drive-connection-changed`, syncDone);
+      return () => {
+        window.removeEventListener(`pil-drive-sync-complete`, syncDone);
+        window.removeEventListener(`pil-drive-connection-changed`, syncDone);
+      };
     }, []),
     !Ea(e))
   )
     return null;
   async function m() {
+    if (!s.connected) {
+      a.connect();
+      return;
+    }
     (u(!0), f({ t: `동기화하는 중…`, k: `` }));
     try {
       (await a.ensure(), await n.store.setMeta(`driveConnected`, !0), await n.store.setMeta(`driveChoiceAsked`, !0));
@@ -14219,7 +14212,13 @@ function Za({ clientId: e = wa, tokenManager: t }) {
     }
   }
   async function h() {
-    (a.revoke(),
+    try {
+      await a.revoke();
+    } catch (error) {
+      f({ t: error.message || `연결을 해제하지 못했어요.`, k: `bad` });
+      return;
+    }
+    (
       await n.store.setMeta(`driveConnected`, !1),
       window.dispatchEvent(new CustomEvent(`pil-drive-connection-changed`)),
       await p(),
@@ -14278,7 +14277,7 @@ function Za({ clientId: e = wa, tokenManager: t }) {
         children: [
           `내 구글 드라이브의 `,
           H(`b`, { children: `이 앱 전용 숨김 폴더` }),
-          `에 데이터를 올리고 받아서 폰·PC를 맞춰요. 다른 드라이브 파일은 볼 수 없고, 운영자 서버는 거치지 않아요. 연결하지 않으면 아무것도 전송되지 않아요.`,
+          `에 데이터를 올리고 받아서 폰·PC를 맞춰요. 다른 드라이브 파일은 볼 수 없어요. 동기화 데이터와 사진은 브라우저에서 구글 드라이브로 직접 전송되고, 서버에는 암호화된 로그인 갱신 정보만 보관돼요. 연결 전에는 전송되지 않아요.`,
         ],
       }),
       H(`p`, {
@@ -14344,7 +14343,7 @@ function Za({ clientId: e = wa, tokenManager: t }) {
         children: [
           `기기마다 같은 구글 계정으로 연결하세요. 두 기기에서 같은 항목을 고치면 `,
           H(`b`, { children: `나중에 고친 쪽` }),
-          `이 남아요(항목별). 연결된 동안에는 변경 후와 앱으로 돌아왔을 때 자동 동기화해요. 브라우저를 새로 열었거나 권한이 만료되면 보안을 위해 “지금 동기화”를 눌러 다시 확인해 주세요.`,
+          `이 남아요(항목별). 연결된 뒤에는 앱을 열 때, 변경 후, 앱으로 돌아왔을 때 자동 동기화해요. 연결 해제 시 서버의 로그인 갱신 정보도 삭제되며, 이미 드라이브에 저장된 데이터는 남아요.`,
         ],
       }),
     ],
@@ -15278,7 +15277,7 @@ var ro = {
     [`inks`, `잉크`],
     [`pens`, `만년필`],
   ],
-  oo = `1.124.0`;
+  oo = `1.125.0`;
 function so({ message: e }) {
   return H(`main`, {
     class: `fatal`,
@@ -15311,15 +15310,10 @@ function co() {
 function DriveAutoSync({ c, photos, auth, onStatus }) {
   let running = ft(!1), baseline = ft(``), timer = ft(null);
   z(() => {
-    if (!Ea(wa)) return;
     let active = !0, connected = !1;
     baseline.current = Ua(F.map((kind) => c.state[kind]));
     async function sync(reason) {
       if (!active || !connected || running.current) return;
-      if (!auth.hasToken()) {
-        onStatus(`Drive 연결은 켜져 있어요. 이 앱을 새로 열었거나 권한이 만료된 경우 ‘지금 동기화’를 눌러 다시 확인해 주세요.`);
-        return;
-      }
       running.current = !0;
       onStatus(reason === `change` ? `변경 사항을 Drive에 동기화하고 있어요…` : `Drive 변경 사항을 확인하고 있어요…`);
       try {
@@ -15352,9 +15346,11 @@ function DriveAutoSync({ c, photos, auth, onStatus }) {
       },
       onOnline = () => checkConnection(!0),
       onConnection = () => checkConnection(!1);
+    let onSessionRestored = () => checkConnection(!0);
     document.addEventListener(`visibilitychange`, onVisibility);
     window.addEventListener(`online`, onOnline);
     window.addEventListener(`pil-drive-connection-changed`, onConnection);
+    window.addEventListener(`pil-drive-session-restored`, onSessionRestored);
     checkConnection(!0);
     return () => {
       active = !1;
@@ -15363,6 +15359,7 @@ function DriveAutoSync({ c, photos, auth, onStatus }) {
       document.removeEventListener(`visibilitychange`, onVisibility);
       window.removeEventListener(`online`, onOnline);
       window.removeEventListener(`pil-drive-connection-changed`, onConnection);
+      window.removeEventListener(`pil-drive-session-restored`, onSessionRestored);
     };
   }, [c, photos, auth]);
   return null;
@@ -15403,7 +15400,53 @@ function lo({ c: e, photos: t }) {
         window.addEventListener(`pil-update`, e),
         () => window.removeEventListener(`pil-update`, e)
       );
-    }, []));
+    }, []),
+    z(() => {
+      let active = !0;
+      let onExpired = async () => {
+        await e.store.setMeta(`driveConnected`, !1);
+        if (active) {
+          d(`Google Drive 로그인 유지 기간이 끝났어요. 다시 연결해 주세요.`);
+          window.dispatchEvent(new CustomEvent(`pil-drive-connection-changed`));
+        }
+      };
+      window.addEventListener(`pil-drive-session-expired`, onExpired);
+      (async () => {
+        try {
+          let { connected } = await driveToken.sessionStatus();
+          if (!active) return;
+          let wasConnected = !!(await e.store.getMeta(`driveConnected`));
+          await e.store.setMeta(`driveConnected`, !!connected);
+          if (connected) {
+            await e.store.setMeta(`driveChoiceAsked`, !0);
+            window.dispatchEvent(new CustomEvent(`pil-drive-session-restored`));
+          } else if (wasConnected) {
+            window.dispatchEvent(new CustomEvent(`pil-drive-connection-changed`));
+          }
+        } catch (error) {
+          console.warn(`Google Drive session could not be restored`, error?.message || ``);
+        }
+      })();
+      let result = new URLSearchParams(location.search).get(`driveAuth`);
+      let messages = {
+        connected: `Google Drive 연결을 완료했어요. 앱 데이터를 확인하고 동기화합니다.`,
+        cancelled: `Google 로그인을 취소했어요.`,
+        failed: `Google Drive 연결에 실패했어요. 다시 시도해 주세요.`,
+        expired: `로그인 요청 시간이 지나 연결하지 못했어요. 다시 시도해 주세요.`,
+        scope: `Drive 앱 전용 폴더 권한을 확인하지 못했어요. 다시 연결해 주세요.`,
+        refresh: `자동 로그인을 설정하지 못했어요. 연결을 다시 시도해 주세요.`,
+      };
+      if (result && messages[result]) {
+        d(messages[result]);
+        let url = new URL(location.href);
+        url.searchParams.delete(`driveAuth`);
+        history.replaceState(null, ``, url.pathname + url.search + url.hash);
+      }
+      return () => {
+        active = !1;
+        window.removeEventListener(`pil-drive-session-expired`, onExpired);
+      };
+    }, [e, driveToken]));
   let f = (e, t) => {
       (a(e), s(t || null), l(!1), window.scrollTo(0, 0));
     },
