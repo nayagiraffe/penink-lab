@@ -2166,18 +2166,17 @@ function jt(e, t = {}) {
     return { region: r, nib: n, wetness: a, conf: a === null ? 0 : 1 };
   }
   function v(e) {
-    let t = String(e || ``);
-    return t === `매우 풍부` || t === `풍부`
-      ? 1
-      : t === `보통~풍부`
-        ? 0.65
-        : t === `보통`
-          ? 0
-          : t === `약간 건조`
-            ? -0.65
-            : t === `건조`
-              ? -1
-              : null;
+    let t = String(e || ``).trim().replace(/\s+/g, ` `).toLowerCase();
+    if (!t || /^(미확인|unknown|없음|n\/a)$/i.test(t)) return null;
+    if (/^(매우 풍부|풍부)$/.test(t)) return 1;
+    if (/매우.*(건조|부족)|거의.*(안 흐르|흐르지 않)|very dry|very poor/.test(t)) return -1;
+    if (/약간.*(건조|부족)|조금.*(건조|부족)|약한 흐름|slightly dry/.test(t)) return -0.65;
+    if (/보통.{0,4}(풍부|촉촉)|촉촉.{0,4}보통|보통보다 풍부/.test(t)) return 0.65;
+    if (/매우.*(풍부|촉촉)|아주.*(풍부|촉촉)|매우 잘 흐르|very wet|very good/.test(t)) return 1;
+    if (/풍부|촉촉|원활|잘 흐르|좋은 흐름|wet|good flow/.test(t)) return 0.65;
+    if (/건조|부족|흐름 약함|잘 흐르지 않|dry|poor flow/.test(t)) return -1;
+    if (/^(보통|중간|평균|적당|양호|normal|medium|average)(하게|한 편|함)?$/.test(t)) return 0;
+    return null;
   }
   function y(e, t) {
     let n = e?.userEvidence?.handsOn;
@@ -2219,6 +2218,10 @@ function jt(e, t = {}) {
     ) {
       let e = v(a.flow);
       e !== null && ((o = e), (c = `user_checked_external`));
+    }
+    if (o === null && e.flow) {
+      let t = v(e.flow);
+      t !== null && ((o = t), (c = `user_ink_record`));
     }
     if (i) {
       let e = v(i.flow);
@@ -2269,6 +2272,8 @@ function jt(e, t = {}) {
       surfaceTension: _,
       verifiedHandOn: i,
       checkedExternal: a,
+      flowRecorded: !!String(e.flow || ``).trim() &&
+        !/^(미확인|unknown|없음|n\/a)$/i.test(String(e.flow).trim()),
     };
   }
   let S = (e) => e != null && e !== `` && Number.isFinite(Number(e));
@@ -2329,13 +2334,20 @@ function jt(e, t = {}) {
         s.push(
           a.quality === `user_hands_on_matching_pen`
             ? `직접 시필 흐름(해당 만년필)`
+            : a.quality === `user_ink_record`
+              ? `잉크 카드에 기록한 흐름 반영 (${n.flow})`
             : a.quality === `user_checked_external`
               ? `사용자가 원문 확인한 외부 리뷰(독립 재검증 전)`
               : a.quality === `review_rechecked`
                 ? `개별 리뷰 흐름(원문 재확인)`
                 : `개별 리뷰 흐름(이전 조사·재확인 대기)`,
         ));
-    } else c.push(`잉크 공급·흐름 데이터 미확인`);
+    } else
+      c.push(
+        a.flowRecorded
+          ? `잉크 카드의 흐름 기록은 있으나 점수 기준으로 해석할 수 없는 표현`
+          : `잉크 공급·흐름 데이터 미확인`,
+      );
     (a.feather === null
       ? c.push(`종이별 퍼짐 정보 미확인`)
       : ((m += 16),
@@ -10077,7 +10089,7 @@ function inkRecommendationTraits(ink, match) {
   if (flow && !/^(미확인|unknown|없음)$/i.test(flow)) traits.push(`흐름 ${flow.slice(0, 28)}`);
   if (why.some((item) => /농담\(shading\)|농담 관찰/.test(item))) traits.push(`농담 관찰`);
   if (why.some((item) => /광택\(sheen\)|테 관찰/.test(item))) traits.push(`테 관찰`);
-  if (warnings.some((item) => /잉크 공급·흐름 데이터 미확인/.test(item)) && !traits.some((item) => item.startsWith(`흐름 `))) traits.push(`흐름 미확인`);
+  if (warnings.some((item) => /잉크 공급·흐름 데이터 미확인|흐름 기록은 있으나/.test(item)) && !traits.some((item) => item.startsWith(`흐름 `))) traits.push(`흐름 미확인`);
   return [...new Set(traits)].slice(0, 4);
 }
 function mi() {
@@ -15488,7 +15500,7 @@ var ro = {
     [`inks`, `잉크`],
     [`pens`, `만년필`],
   ],
-  oo = `1.134.0`;
+  oo = `1.135.0`;
 function so({ message: e }) {
   return H(`main`, {
     class: `fatal`,
