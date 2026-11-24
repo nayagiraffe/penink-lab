@@ -30,6 +30,7 @@ const redirect = (url, headers = {}) => {
 };
 
 function base64url(bytes) {
+  if (bytes instanceof ArrayBuffer) bytes = new Uint8Array(bytes);
   let binary = "";
   for (const byte of bytes) binary += String.fromCharCode(byte);
   return btoa(binary).replaceAll("+", "-").replaceAll("/", "_").replace(/=+$/u, "");
