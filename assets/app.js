@@ -4967,6 +4967,18 @@ function An(e) {
   }
   return i;
 }
+function usableInkColor(ink) {
+  let hex = ink && ink.colorHex;
+  if (!Cn(hex)) return ``;
+  if (ink.colorSource !== `auto`) return hex.toLowerCase();
+  let [r, g, b] = On(hex),
+    max = Math.max(r, g, b),
+    min = Math.min(r, g, b);
+  return max < 48 && max - min < 18 ? `` : hex.toLowerCase();
+}
+function hasUntrustedDarkPhotoColor(ink) {
+  return !!(ink && ink.colorSource === `auto` && Cn(ink.colorHex) && !usableInkColor(ink));
+}
 function jn(e, t, n) {
   let r = new Map();
   for (let i = 0; i < n; i++)
@@ -4978,7 +4990,9 @@ function jn(e, t, n) {
         l = e[o + 2],
         u = Math.max(s, c, l),
         d = Math.min(s, c, l),
-        f = u / 255,
+        ifDarkNeutral = u < 48 && u - d < 18;
+      if (ifDarkNeutral) continue;
+      let f = u / 255,
         p = u ? (u - d) / u : 0;
       if (f > 0.88 && p < 0.15) continue;
       let m = (a + 0.5) / t - 0.5,
@@ -6062,10 +6076,10 @@ function Cr({
   let { c: o, go: s, toast: notify } = U(),
     c = o.state,
     l = gr(e.photo),
-    colorNeighbors = Cn(e.colorHex)
+    colorNeighbors = usableInkColor(e)
       ? c.inks
-          .filter((ink) => ink.id !== e.id && Cn(ink.colorHex))
-          .map((ink) => ({ ink, delta: ColorDeltaE00(e.colorHex, ink.colorHex) }))
+          .filter((ink) => ink.id !== e.id && usableInkColor(ink))
+          .map((ink) => ({ ink, delta: ColorDeltaE00(usableInkColor(e), usableInkColor(ink)) }))
           .filter((match) => match.delta !== null && match.delta <= 10)
           .sort((a, b) => a.delta - b.delta)
           .slice(0, 3)
@@ -6156,7 +6170,11 @@ function Cr({
             H(`h3`, { children: `가까운 잉크 색상 · ΔE00` }),
             H(`p`, {
               class: `muted`,
-              children: `HEX 색이 등록된 잉크끼리 CIEDE2000으로 비교해요. ΔE00 2 이하는 거의 중복, 2~10은 비슷한 색으로 봅니다. 사진 조명·화면·종이 차이는 반영하지 않아요.`,
+              children: `확인 가능한 HEX 색만 CIEDE2000으로 비교해요. ΔE00 2 이하는 거의 중복, 2~10은 비슷한 색으로 봅니다. 사진에서 찾은 어두운 무채색은 배경일 수 있어 비교에서 제외합니다.`,
+            }),
+            hasUntrustedDarkPhotoColor(e) && H(`p`, {
+              class: `hint`,
+              children: `사진에서 찾은 색 코드가 거의 검정인 무채색이라 비교에서 제외했어요. 잉크색이 넓게 보이는 영역에서 다시 추출하거나 색 코드를 확인해 입력해 주세요.`,
             }),
             Cn(e.colorHex)
               ? colorNeighbors.length
@@ -6524,10 +6542,10 @@ function Tr({ kind: e, onClose: t, prefill: n }) {
       [o, a, catalogMode, catalogBrand],
     ),
     y = (e, t) => _.some((n) => V(n.brand) === V(e) && V(n.name) === V(t)),
-    colorMatches = !a && Cn(m.colorHex)
+    colorMatches = !a && usableInkColor(m)
       ? r.state.inks
-          .filter((ink) => Cn(ink.colorHex))
-          .map((ink) => ({ ink, delta: ColorDeltaE00(m.colorHex, ink.colorHex) }))
+          .filter((ink) => usableInkColor(ink))
+          .map((ink) => ({ ink, delta: ColorDeltaE00(usableInkColor(m), usableInkColor(ink)) }))
           .filter((match) => match.delta !== null && match.delta <= 10)
           .sort((first, second) => first.delta - second.delta)
           .slice(0, 3)
@@ -6560,10 +6578,10 @@ function Tr({ kind: e, onClose: t, prefill: n }) {
   }
   async function x(n, force = !1) {
     if (y(n.brand, n.name)) return (setPendingColorAdd(null), p(`이미 있어요: ${n.brand} ${n.name}`));
-    if (!a && !force && Cn(n.colorHex)) {
+    if (!a && !force && usableInkColor(n)) {
       let match = r.state.inks
-        .filter((ink) => Cn(ink.colorHex))
-        .map((ink) => ({ ink, delta: ColorDeltaE00(n.colorHex, ink.colorHex) }))
+        .filter((ink) => usableInkColor(ink))
+        .map((ink) => ({ ink, delta: ColorDeltaE00(usableInkColor(n), usableInkColor(ink)) }))
         .find((entry) => entry.delta !== null && entry.delta <= 2);
       if (match) {
         setPendingColorAdd({ item: n, match });
@@ -7640,10 +7658,10 @@ function Gr({ ink: e, onClose: t }) {
     m = _n(
       n.state.inks.filter((t) => t.id !== e.id).concat([{ family: a.family }]),
     ),
-    colorMatches = Cn(a.colorHex)
+    colorMatches = usableInkColor(a)
       ? n.state.inks
-          .filter((ink) => ink.id !== e.id && Cn(ink.colorHex))
-          .map((ink) => ({ ink, delta: ColorDeltaE00(a.colorHex, ink.colorHex) }))
+          .filter((ink) => ink.id !== e.id && usableInkColor(ink))
+          .map((ink) => ({ ink, delta: ColorDeltaE00(usableInkColor(a), usableInkColor(ink)) }))
           .filter((match) => match.delta !== null && match.delta <= 10)
           .sort((first, second) => first.delta - second.delta)
           .slice(0, 3)
@@ -12057,12 +12075,12 @@ function Si() {
     [colorFilter, setColorFilter] = R(``),
     u = B(() => Gn(), []),
     nearColorReview = B(() => {
-      let colored = e.state.inks.filter((ink) => Cn(ink.colorHex)),
+      let colored = e.state.inks.filter((ink) => usableInkColor(ink)),
         pairs = [],
         duplicatePairs = [];
       for (let first = 0; first < colored.length; first++)
         for (let second = first + 1; second < colored.length; second++) {
-          let delta = ColorDeltaE00(colored[first].colorHex, colored[second].colorHex);
+          let delta = ColorDeltaE00(usableInkColor(colored[first]), usableInkColor(colored[second]));
           if (delta !== null && delta <= 10) {
             let pair = { first: colored[first], second: colored[second], delta };
             (pairs.push(pair), delta <= 2 && duplicatePairs.push(pair));
@@ -12150,7 +12168,7 @@ function Si() {
           }),
           H(`p`, {
             class: `hint`,
-            children: `ΔE00는 등록된 HEX 색의 지각적 차이를 비교합니다. 이 앱은 2 이하를 거의 구분하기 어려운 색, 2 초과~10 이하를 유사색 후보로 묶어요. 사진의 조명·종이와 화면 설정에 따라 실제 잉크 색과 달라질 수 있으니 참고용으로 봐 주세요.`,
+            children: `ΔE00는 확인 가능한 HEX 색의 지각적 차이를 비교합니다. 2 이하는 거의 중복, 2 초과~10 이하는 유사색 후보예요. 사진에서 추출한 거의 검정인 무채색은 배경 오인 가능성이 있어 제외합니다.`,
           }),
           H(`div`, {
             class: `sort-bar`,
@@ -13764,13 +13782,13 @@ function Sa(e, t, n = Date.now()) {
       }
   }
   let importedInkRecords = i
-      .filter((entry) => entry.kind === `inks` && Cn(entry.rec.colorHex))
+      .filter((entry) => entry.kind === `inks` && usableInkColor(entry.rec))
       .map((entry) => entry.rec),
     colorPairsSeen = new Set();
   for (let imported of importedInkRecords)
     for (let other of u) {
-      if (other.id === imported.id || !Cn(other.colorHex)) continue;
-      let delta = ColorDeltaE00(imported.colorHex, other.colorHex);
+      if (other.id === imported.id || !usableInkColor(other)) continue;
+      let delta = ColorDeltaE00(usableInkColor(imported), usableInkColor(other));
       if (delta === null || delta > 2) continue;
       let key = [imported.id, other.id].sort().join(`|`);
       if (colorPairsSeen.has(key)) continue;
@@ -15277,7 +15295,7 @@ var ro = {
     [`inks`, `잉크`],
     [`pens`, `만년필`],
   ],
-  oo = `1.126.0`;
+  oo = `1.127.0`;
 function so({ message: e }) {
   return H(`main`, {
     class: `fatal`,
