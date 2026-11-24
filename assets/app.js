@@ -2468,6 +2468,68 @@ function jt(e, t = {}) {
           e <= -5 && c.push(`실제 시필에서 부적합 징후 관찰`));
       }
     }
+    if (I) {
+      let hasExactPaperTest = b.some(
+          (sample) =>
+            sample.paperId === I.id ||
+            (!sample.paperId && sample.paper && V(sample.paper) === V(I.name)),
+        ),
+        delivery = a.supply === null ? null : h + a.supply * 0.9,
+        paperAdjustment = 0,
+        paperReasons = [],
+        inkVisualEffect = a.sheen || a.shading;
+      if (!hasExactPaperTest) {
+        if (I.absorbency === `high`) {
+          if (a.feather !== null && a.feather > 0) {
+            let penalty = Math.min(3, Number(a.feather) * 1.5);
+            (paperAdjustment -= penalty,
+              paperReasons.push(`흡수성 높은 종이 × 잉크 번짐 성향 (−${penalty.toFixed(1)})`));
+          }
+          if (delivery !== null && delivery > 0.75) {
+            (paperAdjustment -= 1.5,
+              paperReasons.push(`흡수성 높은 종이 × 펜·잉크 흐름이 풍부함 (−1.5)`),
+              c.push(`종이 흡수성과 흐름을 이용한 번짐 위험 추정`));
+          }
+        }
+        if (I.absorbency === `low` && delivery !== null && delivery > 0.75) {
+          (paperAdjustment -= 1.5,
+            paperReasons.push(`흡수성 낮은 종이 × 펜·잉크 흐름이 풍부함: 마름 지연 가능성 (−1.5)`),
+            c.push(`종이 흡수성과 흐름을 이용한 마름 지연 추정`));
+        }
+        if (I.gsm !== `` && I.gsm !== null && Number(I.gsm) < 70 && delivery !== null && delivery > 0.75) {
+          (paperAdjustment -= 1,
+            paperReasons.push(`평량 ${I.gsm}gsm × 펜·잉크 흐름이 풍부함 (−1.0)`),
+            c.push(`낮은 평량과 풍부한 흐름 조합의 뒷면 비침 가능성 추정`));
+        }
+        if (I.texture === `rough` && (i.nib === `ultrafine` || i.nib === `fine`)) {
+          (paperAdjustment -= 1,
+            paperReasons.push(`거친 표면 × 가는 닙의 필기감 주의 (−1.0)`));
+        }
+        if (I.texture === `rough` && a.lubrication !== null && a.lubrication < 0) {
+          let penalty = Math.min(1.5, Math.abs(a.lubrication) * 0.75);
+          (paperAdjustment -= penalty,
+            paperReasons.push(`거친 표면 × 윤활감 낮은 잉크 (−${penalty.toFixed(1)})`));
+        } else if (I.texture === `smooth` && a.lubrication !== null && a.lubrication < 0) {
+          let bonus = Math.min(1, Math.abs(a.lubrication) * 0.5);
+          (paperAdjustment += bonus,
+            paperReasons.push(`매끄러운 표면이 윤활감 낮은 잉크의 필기감을 보완 (+${bonus.toFixed(1)})`));
+        }
+        if (r === `sheen` && inkVisualEffect && I.absorbency === `low`) {
+          (paperAdjustment += 1.5,
+            paperReasons.push(`흡수성 낮은 종이 × 테·농담 우선순위 (+1.5)`));
+        } else if (r === `sheen` && inkVisualEffect && I.absorbency === `high`) {
+          (paperAdjustment -= 1,
+            paperReasons.push(`흡수성 높은 종이 × 테·농담 표현 우선순위 (−1.0)`));
+        }
+        paperAdjustment = Math.max(-5, Math.min(3, paperAdjustment));
+        if (paperReasons.length) {
+          (u += paperAdjustment,
+            s.push(`종이 프로필 기반 추정: ${paperReasons.join(` · `)}`));
+        } else if (I.absorbency || I.texture || paperGsmValue(I.gsm) !== null) {
+          s.push(`종이 프로필 확인: 입력된 특성으로 추가 점수 보정 근거를 찾지 못함`);
+        }
+      }
+    }
     let C =
       d(n)?.sourceVerification === `rechecked`
         ? 55
@@ -10127,10 +10189,17 @@ function mi() {
       [r.pens, r.inks, r.history, r.tests, r.papers, S && S.id, b, c, P],
     ),
     selectedPaper = P ? r.papers.find((paper) => paper.id === P) : null,
+    paperProfileEvaluated = selectedPaper
+      ? C.some((match) =>
+          (match.why || []).some((reason) => reason.startsWith(`종이 프로필`)),
+        )
+      : false,
     paperEvidenceFound = selectedPaper
       ? C.some((match) =>
           (match.why || []).some((reason) =>
-            reason.startsWith(`${selectedPaper.name} 기준 시필`),
+            reason.startsWith(`${selectedPaper.name} 기준 시필`) ||
+            reason.startsWith(`종이 프로필 기반 추정:`) ||
+            reason.startsWith(`종이 프로필 확인:`),
           ),
         )
       : true,
@@ -10254,11 +10323,16 @@ function mi() {
         ],
       }),
       S && H(di, { base: S, isPen: b, onZoom: p }, S.id + i),
+      selectedPaper && paperProfileEvaluated &&
+        H(`p`, {
+          class: `hint`,
+          children: `종이 프로필 보정은 흡수성·표면·평량과 잉크·닙 기록을 이용한 추정치예요. 같은 펜·잉크·종이의 직접 시필 기록이 있으면 그 결과를 우선 반영합니다.`,
+        }),
       selectedPaper && !paperEvidenceFound &&
         H(`p`, {
           class: `hint`,
           role: `status`,
-          children: `이 종이에 대한 직접 또는 비교 가능한 시필 기록이 없어 이번 추천 점수에는 종이 조건이 반영되지 않았어요. 이 종이로 시필 기록을 남기면 이후 추천에 반영돼요.`,
+          children: `이 종이에 대한 시필 기록이나 계산에 쓸 흡수성·표면·평량 정보가 부족해 추천 점수가 달라지지 않았어요. 종이 프로필을 채우거나 이 종이로 시필 기록을 남기면 반영돼요.`,
         }),
       S &&
         C.length > 0 &&
@@ -10317,7 +10391,15 @@ function mi() {
         children: w.slice(0, u).map((e, n) => {
           let paperSuggestion = b ? recommendPaperFromTests(S.id, e.ink.id, r.tests, r.papers) : null,
             inkTraits = b ? inkRecommendationTraits(e.ink, e) : [],
-            reasonPreview = (e.why || []).slice(0, 2),
+            reasonPreview = (() => {
+              let reasons = e.why || [],
+                paperReason = P
+                  ? reasons.find((reason) => reason.startsWith(`종이 프로필`))
+                  : null;
+              return paperReason
+                ? [paperReason, ...reasons.filter((reason) => reason !== paperReason).slice(0, 1)]
+                : reasons.slice(0, 2);
+            })(),
             warningPreview = (e.warnings || [])[0] || ``;
           return H(
             `li`,
@@ -15500,7 +15582,7 @@ var ro = {
     [`inks`, `잉크`],
     [`pens`, `만년필`],
   ],
-  oo = `1.135.0`;
+  oo = `1.136.0`;
 function so({ message: e }) {
   return H(`main`, {
     class: `fatal`,

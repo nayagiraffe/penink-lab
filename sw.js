@@ -1,9 +1,9 @@
 /* Pen & Ink Lab 서비스 워커. 사용자 데이터(IndexedDB)는 건드리지 않는다. */
-const CACHE = "pil2-v1.135.0-recovered-source";
+const CACHE = "pil2-v1.136.0-recovered-source";
 const ASSETS = [
   "./",
-  "./assets/app.css?v=1.135.0",
-  "./assets/app.js?v=1.135.0",
+  "./assets/app.css?v=1.136.0",
+  "./assets/app.js?v=1.136.0",
   "./icons/favicon-32.png",
   "./icons/favicon-64.png",
   "./icons/icon-180.png",
