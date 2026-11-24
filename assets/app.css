@@ -1929,6 +1929,35 @@ select.input {
   padding: 7px 10px;
   display: flex;
 }
+.dt-reco-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  color: var(--ink);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+}
+.dt-reco-link span {
+  text-decoration: underline;
+  text-decoration-color: var(--line);
+  text-underline-offset: 2px;
+}
+.dt-reco-link:hover span,
+.dt-reco-link:focus-visible span {
+  color: var(--accent);
+  text-decoration-color: currentColor;
+}
+.dt-reco-link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
 .dt-list small {
   color: var(--muted);
 }

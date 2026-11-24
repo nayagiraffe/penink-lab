@@ -5803,7 +5803,7 @@ function yr({ url: e, alt: t }) {
     ? H(`div`, { class: `photo-prev`, children: H(`img`, { src: e, alt: t }) })
     : null;
 }
-function br({ rows: e, onOpen: t, label: n }) {
+function br({ rows: e, onOpen: t, onSelect: select, label: n }) {
   return e.length
     ? H(`section`, {
         "aria-label": n,
@@ -5816,8 +5816,17 @@ function br({ rows: e, onOpen: t, label: n }) {
                 `li`,
                 {
                   children: [
-                    H(`span`, { children: e.name }),
-                    H(`b`, { children: [e.score, `점`] }),
+                    H(`button`, {
+                      class: `dt-reco-link`,
+                      type: `button`,
+                      "aria-label": `${e.name} 상세 정보 열기 · 적합도 ${e.score}점`,
+                      "data-top3-item": e.key,
+                      onClick: () => select?.(e.key),
+                      children: [
+                        H(`span`, { children: e.name }),
+                        H(`b`, { children: [e.score, `점`] }),
+                      ],
+                    }),
                   ],
                 },
                 e.key,
@@ -5993,6 +6002,7 @@ function xr({ pen: e, onClose: t, onSwap: n, onEdit: r, onPhoto: i }) {
         H(br, {
           rows: p,
           label: `어울리는 잉크 Top 3`,
+          onSelect: (inkId) => o(`inks`, { detailId: inkId }),
           onOpen: () => o(`reco`, { dir: `pen`, target: e.id }),
         }),
         H(`div`, {
@@ -6489,6 +6499,7 @@ function Cr({
         H(br, {
           rows: p,
           label: `어울리는 만년필 Top 3`,
+          onSelect: (penId) => s(`pens`, { detailId: penId }),
           onOpen: () => s(`reco`, { dir: `ink`, target: e.id }),
         }),
         H(`div`, {
@@ -8555,6 +8566,7 @@ function Zr() {
     [l, u] = R((i && i.view) || `brand`);
   z(() => {
     (i && i.view && u(i.view),
+      i && i.detailId && c({ t: `detail`, id: i.detailId }),
       i &&
         i.group &&
         setTimeout(() => {
@@ -12182,7 +12194,7 @@ var xi = (e) => {
         : ``;
 };
 function Si() {
-  let { c: e, photos: t, toast: n } = U(),
+  let { c: e, photos: t, toast: n, nav: nav } = U(),
     [i, a] = R(``),
     [o, s] = R(null),
     [c, l] = R(`brand`),
@@ -12263,6 +12275,10 @@ function Si() {
     f = B(() => u[c].group(d), [u, c, d]),
     p = (t) => e.state.pens.filter((e) => e.status === `현재 잉입` && Rn(e, t)),
     h = (t) => e.state.inks.find((e) => e.id === t);
+  z(() => {
+    nav && nav.detailId && e.state.inks.some((ink) => ink.id === nav.detailId) &&
+      s({ t: `detail`, id: nav.detailId });
+  }, [nav, e.state.inks]);
   return H(`section`, {
     "aria-label": `잉크`,
     children: [
@@ -15472,7 +15488,7 @@ var ro = {
     [`inks`, `잉크`],
     [`pens`, `만년필`],
   ],
-  oo = `1.133.0`;
+  oo = `1.134.0`;
 function so({ message: e }) {
   return H(`main`, {
     class: `fatal`,
