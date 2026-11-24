@@ -1964,6 +1964,25 @@ select.input {
 .plain-list .list-row small {
   display: block;
 }
+.ink-neighbor-link {
+  all: unset;
+  align-items: center;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  gap: 8px;
+  min-width: 0;
+  padding: 4px;
+  text-align: left;
+  width: 100%;
+}
+.ink-neighbor-link:hover {
+  background: var(--sunken);
+}
+.ink-neighbor-link:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
 .now-box {
   background: var(--accent-soft);
   border: 1px solid color-mix(in srgb, var(--accent) 22%, transparent);

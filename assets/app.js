@@ -6224,22 +6224,28 @@ function Cr({
                     children: colorNeighbors.map(({ ink, delta }) =>
                       H(`li`, {
                         class: `list-row`,
-                        children: [
-                          H(`span`, {
-                            class: `dot`,
-                            style: { background: ink.colorHex },
-                            "aria-hidden": `true`,
-                          }),
-                          H(`span`, {
-                            children: [
-                              `${ink.brand} ${ink.name}`,
-                              H(`small`, {
-                                class: `muted`,
-                                children: ` · ΔE00 ${delta.toFixed(1)} · ${delta <= 2 ? `거의 중복` : `비슷한 색`}`,
-                              }),
-                            ],
-                          }),
-                        ],
+                        children: H(`button`, {
+                          class: `ink-neighbor-link`,
+                          type: `button`,
+                          "aria-label": `${ink.brand} ${ink.name} 상세 보기, ΔE00 ${delta.toFixed(1)} · ${delta <= 2 ? `거의 중복` : `비슷한 색`}`,
+                          onClick: () => s({ t: `detail`, id: ink.id }),
+                          children: [
+                            H(`span`, {
+                              class: `dot`,
+                              style: { background: ink.colorHex },
+                              "aria-hidden": `true`,
+                            }),
+                            H(`span`, {
+                              children: [
+                                `${ink.brand} ${ink.name}`,
+                                H(`small`, {
+                                  class: `muted`,
+                                  children: ` · ΔE00 ${delta.toFixed(1)} · ${delta <= 2 ? `거의 중복` : `비슷한 색`}`,
+                                }),
+                              ],
+                            }),
+                          ],
+                        }),
                       }, ink.id),
                     ),
                   })
@@ -15442,7 +15448,7 @@ var ro = {
     [`inks`, `잉크`],
     [`pens`, `만년필`],
   ],
-  oo = `1.130.0`;
+  oo = `1.131.0`;
 function so({ message: e }) {
   return H(`main`, {
     class: `fatal`,
